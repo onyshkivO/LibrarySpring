@@ -1,0 +1,56 @@
+package com.onyshkiv.libraryspring.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
+import java.util.List;
+
+@Data
+@NoArgsConstructor
+@Entity
+@Table(name = "book")
+public class Book {
+    @Id
+    @Column(name = "isbn")
+    @NotNull(message = "Bad book isbn")
+    @Pattern(regexp = "^(?=(?:\\D?\\d){10}(?:(?:\\D?\\d){3})?$)[\\d-]+?$",message = "Bad book isbn")
+    private String isbn;
+
+    @Column(name = "name")
+    @NotBlank(message = "Bad book name")
+    @NotNull(message = "Bad book name")
+    private String name;
+
+    @Column(name = "date_of_publication")
+    @Temporal(TemporalType.DATE)
+//    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    private Date dateOfPublication;
+
+    @Column(name = "quantity")
+    @NotNull(message = "Bad quantity value")
+    private Integer quantity;
+
+    @Column(name = "details")
+    private String details;
+
+    @OneToMany(mappedBy = "book")
+    private List<ActiveBook> activeBooks;
+
+
+    @ManyToOne
+    @JoinColumn(name = "publication_id", referencedColumnName = "publication_id")
+    private Publication publication;
+
+    @ManyToMany
+    @JoinTable(name = "book_has_authors",
+            joinColumns = @JoinColumn(name = "b_isbn",referencedColumnName = "isbn"),
+            inverseJoinColumns = @JoinColumn(name = "a_id",referencedColumnName = "authors_id"))
+    private List<Author> authors;
+
+}

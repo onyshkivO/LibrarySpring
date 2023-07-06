@@ -1,0 +1,28 @@
+package com.onyshkiv.libraryspring.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+import java.util.Objects;
+
+@Data
+@NoArgsConstructor
+@Entity
+@Table(name="publication")
+public class Publication {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "publication_id")
+    private int publicationId;
+    @Column(name = "name")
+    @NotBlank(message = "Bad publication name")
+    private String name;
+
+    @OneToMany(mappedBy = "publication")
+    private List<Book> books;
+
+}
+
