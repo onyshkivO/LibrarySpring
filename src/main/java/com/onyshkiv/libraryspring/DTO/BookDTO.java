@@ -1,6 +1,8 @@
 package com.onyshkiv.libraryspring.DTO;
 
 import com.onyshkiv.libraryspring.entity.ActiveBook;
+import com.onyshkiv.libraryspring.entity.Author;
+import com.onyshkiv.libraryspring.entity.Publication;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,7 +34,7 @@ public class BookDTO {
     private Integer quantity;
 
     private String details;
-    private PublicationDTO publication;
-    private List<AuthorDTO> authors;
+    private Publication publication;//тут може дто але тоді воно думає, що такого немав бд
+    private List<Author> authors;
 
 }

@@ -1,5 +1,6 @@
 package com.onyshkiv.libraryspring.controller;
 
+import com.onyshkiv.libraryspring.DTO.AuthorDTO;
 import com.onyshkiv.libraryspring.DTO.BookDTO;
 import com.onyshkiv.libraryspring.entity.Book;
 import com.onyshkiv.libraryspring.exception.book.BookNotCreatedException;
@@ -8,13 +9,11 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/books")
@@ -37,11 +36,10 @@ public class BookController {
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
-
     @GetMapping("/{isbn}")
-    public ResponseEntity<BookDTO> getBookByIsbn(@PathVariable("isbn") String isbn) {
+    public ResponseEntity<Book> getBookByIsbn(@PathVariable("isbn") String isbn) {
         Book book = bookService.getBookByIsbn(isbn);
-        return new ResponseEntity<>(convertToBookDTO(book), HttpStatus.OK);
+        return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
     @PostMapping()

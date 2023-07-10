@@ -2,6 +2,7 @@ package com.onyshkiv.libraryspring.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -43,6 +44,7 @@ public class ActiveBook {
 
     @ManyToOne
     @JoinColumn(name = "book_isbn", referencedColumnName = "isbn")
-    @JsonManagedReference("bookActiveBook")
+    //@JsonManagedReference("bookActiveBook")
+    @JsonIgnoreProperties("activeBooks")
     private Book book;
 }

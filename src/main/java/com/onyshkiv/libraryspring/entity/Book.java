@@ -2,6 +2,7 @@ package com.onyshkiv.libraryspring.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -47,20 +48,21 @@ public class Book {
     private String details;
 
     @OneToMany(mappedBy = "book")
-    @JsonBackReference("bookActiveBook")
+    //@JsonBackReference("bookActiveBook")
+    @JsonIgnoreProperties("book")
     private List<ActiveBook> activeBooks;
 
 
     @ManyToOne
     @JoinColumn(name = "publication_id", referencedColumnName = "publication_id")
-    @JsonManagedReference("bookPublication")
+    //@JsonManagedReference("bookPublication")
     private Publication publication;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER,cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "book_has_authors",
             joinColumns = @JoinColumn(name = "b_isbn",referencedColumnName = "isbn"),
             inverseJoinColumns = @JoinColumn(name = "a_id",referencedColumnName = "authors_id"))
-    @JsonManagedReference("bookAuthors")
+    //@JsonManagedReference("bookAuthors")
     private List<Author> authors;
 
 }
