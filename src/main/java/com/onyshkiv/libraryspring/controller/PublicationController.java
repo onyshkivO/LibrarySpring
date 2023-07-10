@@ -30,31 +30,37 @@ public class PublicationController {
     }
 
     @GetMapping()
-    public List<PublicationDTO> getAllPublications() {
-        return publicationService.getAllPublications()
+    public ResponseEntity<List<PublicationDTO>> getAllPublications() {
+        List<PublicationDTO> publications = publicationService.getAllPublications()
                 .stream()
                 .map(this::convertToPublicationDTO)
-                .collect(Collectors.toList());
+                .toList();
+        return new ResponseEntity<>(publications, HttpStatus.OK);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<PublicationDTO> getPublicationById(@PathVariable("id") int id) {
+        PublicationDTO publication = convertToPublicationDTO(publicationService.getPublicationById(id));
+        return new ResponseEntity<>(publication, HttpStatus.OK);
+    }
 
     @PostMapping()
-    public ResponseEntity<HttpStatus> createPublication(@RequestBody @Valid PublicationDTO publicationDTO,
-                                                        BindingResult bindingResult) {
+    public ResponseEntity<PublicationDTO> createPublication(@RequestBody @Valid PublicationDTO publicationDTO,
+                                                            BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new PublicationNotSavedException(bindingResult.getFieldErrors() + " bad name ");
-
-        publicationService.savePublication(convertToPublication(publicationDTO));
-        return ResponseEntity.ok(HttpStatus.OK);
+        Publication publication = publicationService.savePublication(convertToPublication(publicationDTO));
+        return new ResponseEntity<>(convertToPublicationDTO(publication), HttpStatus.OK);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<HttpStatus> updatePublication(@PathVariable("id") int id, @RequestBody @Valid PublicationDTO publicationDTO,
-                                                        BindingResult bindingResult) {
+    public ResponseEntity<PublicationDTO> updatePublication(@PathVariable("id") int id, @RequestBody @Valid PublicationDTO publicationDTO,
+                                                            BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new PublicationNotSavedException(bindingResult.getFieldErrors() + " bad name ");
-        publicationService.updatePublication(id, convertToPublication(publicationDTO));
-        return ResponseEntity.ok(HttpStatus.OK);
+
+        Publication publication = publicationService.updatePublication(id, convertToPublication(publicationDTO));
+        return new ResponseEntity<>(convertToPublicationDTO(publication), HttpStatus.OK);
     }
 
 
