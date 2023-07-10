@@ -3,7 +3,7 @@ package com.onyshkiv.libraryspring.controller;
 
 import com.onyshkiv.libraryspring.DTO.AuthorDTO;
 import com.onyshkiv.libraryspring.entity.Author;
-import com.onyshkiv.libraryspring.exception.AuthorNotSavedException;
+import com.onyshkiv.libraryspring.exception.author.AuthorNotSavedException;
 import com.onyshkiv.libraryspring.service.AuthorService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -14,7 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/authors")

@@ -1,8 +1,8 @@
 package com.onyshkiv.libraryspring.service;
 
 import com.onyshkiv.libraryspring.entity.Author;
-import com.onyshkiv.libraryspring.exception.AuthorNotFoundException;
-import com.onyshkiv.libraryspring.exception.AuthorNotSavedException;
+import com.onyshkiv.libraryspring.exception.author.AuthorNotFoundException;
+import com.onyshkiv.libraryspring.exception.author.AuthorNotSavedException;
 import com.onyshkiv.libraryspring.repository.AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

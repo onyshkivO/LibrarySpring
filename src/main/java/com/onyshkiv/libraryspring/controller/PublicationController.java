@@ -1,21 +1,18 @@
 package com.onyshkiv.libraryspring.controller;
 
-import com.onyshkiv.libraryspring.DTO.AuthorDTO;
 import com.onyshkiv.libraryspring.DTO.PublicationDTO;
 import com.onyshkiv.libraryspring.entity.Publication;
-import com.onyshkiv.libraryspring.exception.PublicationNotSavedException;
+import com.onyshkiv.libraryspring.exception.publication.PublicationNotSavedException;
 import com.onyshkiv.libraryspring.service.PublicationService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/publications")

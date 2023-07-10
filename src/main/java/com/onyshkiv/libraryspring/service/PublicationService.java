@@ -1,10 +1,8 @@
 package com.onyshkiv.libraryspring.service;
 
-import com.onyshkiv.libraryspring.entity.Author;
 import com.onyshkiv.libraryspring.entity.Publication;
-import com.onyshkiv.libraryspring.exception.AuthorNotSavedException;
-import com.onyshkiv.libraryspring.exception.PublicationNotFoundException;
-import com.onyshkiv.libraryspring.exception.PublicationNotSavedException;
+import com.onyshkiv.libraryspring.exception.publication.PublicationNotFoundException;
+import com.onyshkiv.libraryspring.exception.publication.PublicationNotSavedException;
 import com.onyshkiv.libraryspring.repository.PublicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,7 +43,8 @@ public class PublicationService {
     @Transactional
     public Publication updatePublication(Integer id, Publication publication) {
         Optional<Publication> optionalPublication = publicationRepository.findById(id);
-
+        if (optionalPublication.isEmpty())
+            throw new PublicationNotFoundException("Not publication found with id " + id);
         publication.setPublicationId(id);
         return publicationRepository.save(publication);
     }
