@@ -32,5 +32,7 @@ public class BookDTO {
     private Integer quantity;
 
     private String details;
+    private PublicationDTO publication;
+    private List<AuthorDTO> authors;
 
 }

@@ -1,5 +1,8 @@
 package com.onyshkiv.libraryspring.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,14 +20,17 @@ public class ActiveBook {
     private int activeBookId;
 
     @Enumerated(EnumType.ORDINAL)
+    @Column(name = "subscription_status_id")
     private SubscriptionStatus subscriptionStatus;
 
     @Temporal(TemporalType.DATE)
     //    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Column(name = "start_date")
     private Date startDate;
 
     @Temporal(TemporalType.DATE)
     //    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @Column(name = "end_date")
     private Date endDate;
 
     @Column(name = "fine")
@@ -32,9 +38,11 @@ public class ActiveBook {
 
     @ManyToOne
     @JoinColumn(name = "user_login", referencedColumnName = "login")
+   @JsonBackReference("userActiveBook")
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "book_isbn", referencedColumnName = "isbn")
+    @JsonManagedReference("bookActiveBook")
     private Book book;
 }

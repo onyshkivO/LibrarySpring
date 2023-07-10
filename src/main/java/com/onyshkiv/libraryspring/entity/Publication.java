@@ -1,5 +1,8 @@
 package com.onyshkiv.libraryspring.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -22,6 +25,7 @@ public class Publication {
     private String name;
 
     @OneToMany(mappedBy = "publication")
+    @JsonBackReference("bookPublication")
     private List<Book> books;
 
 }

@@ -1,5 +1,8 @@
 package com.onyshkiv.libraryspring.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -26,6 +29,7 @@ public class Author {
     @JoinTable(name = "book_has_authors",
             joinColumns = @JoinColumn(name = "a_id", referencedColumnName = "authors_id"),
             inverseJoinColumns = @JoinColumn(name = "b_isbn", referencedColumnName = "isbn"))
+    @JsonBackReference("bookAuthors")
     private List<Book> books;
 
 }

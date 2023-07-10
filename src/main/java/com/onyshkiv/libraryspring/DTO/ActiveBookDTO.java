@@ -18,7 +18,7 @@ public class ActiveBookDTO {
 
     private Double fine;
 
-    private User user;
+    private UserDTO user;
 
-    private Book book;
+    private BookDTO book;
 }

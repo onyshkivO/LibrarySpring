@@ -1,11 +1,15 @@
 package com.onyshkiv.libraryspring.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -13,6 +17,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@ToString(of = {"isbn","name"})
 @Entity
 @Table(name = "book")
 public class Book {
@@ -36,21 +41,26 @@ public class Book {
     @NotNull(message = "Bad quantity value")
     private Integer quantity;
 
+
+
     @Column(name = "details")
     private String details;
 
     @OneToMany(mappedBy = "book")
+    @JsonBackReference("bookActiveBook")
     private List<ActiveBook> activeBooks;
 
 
     @ManyToOne
     @JoinColumn(name = "publication_id", referencedColumnName = "publication_id")
+    @JsonManagedReference("bookPublication")
     private Publication publication;
 
     @ManyToMany
     @JoinTable(name = "book_has_authors",
             joinColumns = @JoinColumn(name = "b_isbn",referencedColumnName = "isbn"),
             inverseJoinColumns = @JoinColumn(name = "a_id",referencedColumnName = "authors_id"))
+    @JsonManagedReference("bookAuthors")
     private List<Author> authors;
 
 }
