@@ -39,6 +39,7 @@ public class User{
     @NotBlank(message = "Bad password1")
     @NotNull(message = "Bad password2")
     //@Pattern(regexp = "^[A-Za-z0-9_-]{6,18}$", message = "Bad password3")
+    //todo пароль щоб не було видно при отриманні користувача
     private String password;
 
     @Column(name = "first_name")

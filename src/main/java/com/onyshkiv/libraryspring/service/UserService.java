@@ -1,8 +1,6 @@
 package com.onyshkiv.libraryspring.service;
 
 import com.onyshkiv.libraryspring.entity.*;
-import com.onyshkiv.libraryspring.exception.author.AuthorNotFoundException;
-import com.onyshkiv.libraryspring.exception.book.BookNotCreatedException;
 import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
 import com.onyshkiv.libraryspring.exception.user.UserNotSavedException;
 import com.onyshkiv.libraryspring.repository.UserRepository;
@@ -51,7 +49,7 @@ public class UserService {
         if (optionalUser.isEmpty())
             throw new UserNotFoundException("Not user found with login " + login);
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));//todo переробити, бо якщо до прикладу оновлюється статус, то як зробити?
         user.setRole(optionalUser.get().getRole());
         user.setUserStatus(optionalUser.get().getUserStatus());
         return userRepository.save(user);

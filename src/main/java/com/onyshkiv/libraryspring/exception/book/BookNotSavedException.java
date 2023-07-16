@@ -2,8 +2,8 @@ package com.onyshkiv.libraryspring.exception.book;
 
 import com.onyshkiv.libraryspring.exception.MyException;
 
-public class BookNotCreatedException extends MyException {
-    public BookNotCreatedException(String message) {
+public class BookNotSavedException extends MyException {
+    public BookNotSavedException(String message) {
         super(message);
     }
 }

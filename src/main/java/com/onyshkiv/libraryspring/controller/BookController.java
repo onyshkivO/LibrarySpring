@@ -2,7 +2,7 @@ package com.onyshkiv.libraryspring.controller;
 
 import com.onyshkiv.libraryspring.DTO.BookDTO;
 import com.onyshkiv.libraryspring.entity.Book;
-import com.onyshkiv.libraryspring.exception.book.BookNotCreatedException;
+import com.onyshkiv.libraryspring.exception.book.BookNotSavedException;
 import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.service.BookService;
 import com.onyshkiv.libraryspring.util.BookValidator;
@@ -50,7 +50,7 @@ public class BookController {
     @PostMapping()
     public ResponseEntity<BookDTO> saveBook(@RequestBody @Valid BookDTO book, BindingResult bindingResult) {
         bookValidator.validate(book, bindingResult);
-        if (bindingResult.hasErrors()) throw new BookNotCreatedException(bindingResult.getFieldErrors().toString());
+        if (bindingResult.hasErrors()) throw new BookNotSavedException(bindingResult.getFieldErrors().toString());
         Book savedBook = bookService.saveBook(convertToBook(book));
         return new ResponseEntity<>(convertToBookDTO(savedBook), HttpStatus.OK);
     }
@@ -58,7 +58,7 @@ public class BookController {
     @PatchMapping("/{isbn}")
     public ResponseEntity<BookDTO> updateBook(@PathVariable("isbn") String isbn, @RequestBody @Valid BookDTO book, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
-            throw new BookNotCreatedException(bindingResult.getFieldErrors().toString());
+            throw new BookNotSavedException(bindingResult.getFieldErrors().toString());
         Book updatedBook = bookService.updateBook(isbn, convertToBook(book));
         return new ResponseEntity<>(convertToBookDTO(updatedBook), HttpStatus.OK);
     }

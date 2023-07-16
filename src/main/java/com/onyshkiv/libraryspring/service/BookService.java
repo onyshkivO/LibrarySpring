@@ -1,8 +1,7 @@
 package com.onyshkiv.libraryspring.service;
 
 import com.onyshkiv.libraryspring.entity.Book;
-import com.onyshkiv.libraryspring.exception.author.AuthorNotFoundException;
-import com.onyshkiv.libraryspring.exception.book.BookNotCreatedException;
+import com.onyshkiv.libraryspring.exception.book.BookNotSavedException;
 import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,7 @@ public class BookService {
     public Book saveBook(Book book) {
         Optional<Book> optionalBook = bookRepository.findById(book.getIsbn());
         if (optionalBook.isPresent()||book.getIsbn().isBlank())
-            throw new BookNotCreatedException("Book with isbn " + book.getIsbn() + " already exist");
+            throw new BookNotSavedException("Book with isbn " + book.getIsbn() + " already exist");
         return bookRepository.save(book);
     }
 
