@@ -1,5 +1,6 @@
 package com.onyshkiv.libraryspring.DTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.onyshkiv.libraryspring.entity.ActiveBook;
 import com.onyshkiv.libraryspring.entity.Role;
@@ -29,6 +30,7 @@ public class UserDTO {
     @NotBlank(message = "Bad password")
     @NotNull(message = "Bad password")
     @Pattern(regexp = "^[A-Za-z0-9_-]{6,18}$", message = "Bad password")
+    //@JsonIgnore
     private String password;
 
     @NotBlank(message = "Bad First Name")

@@ -2,6 +2,7 @@ package com.onyshkiv.libraryspring.controller;
 
 import com.onyshkiv.libraryspring.DTO.PublicationDTO;
 import com.onyshkiv.libraryspring.entity.Publication;
+import com.onyshkiv.libraryspring.exception.publication.PublicationNotFoundException;
 import com.onyshkiv.libraryspring.exception.publication.PublicationNotSavedException;
 import com.onyshkiv.libraryspring.service.PublicationService;
 import jakarta.validation.Valid;
@@ -13,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/publications")
@@ -37,8 +39,10 @@ public class PublicationController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PublicationDTO> getPublicationById(@PathVariable("id") int id) {
-        PublicationDTO publication = convertToPublicationDTO(publicationService.getPublicationById(id));
-        return new ResponseEntity<>(publication, HttpStatus.OK);
+        Optional<Publication> optionalPublication = publicationService.getPublicationById(id);
+        if (optionalPublication.isEmpty())
+            throw new PublicationNotFoundException("Not publication found with id " + id);
+        return new ResponseEntity<>(convertToPublicationDTO(optionalPublication.get()), HttpStatus.OK);
     }
 
     @PostMapping()

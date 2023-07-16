@@ -25,11 +25,8 @@ public class PublicationService {
         return publicationRepository.findAll();
     }
 
-    public Publication getPublicationById(int id) {
-        Optional<Publication> optionalPublication = publicationRepository.findById(id);
-        if (optionalPublication.isEmpty())
-            throw new PublicationNotFoundException("Not publication found with id " + id);
-        return optionalPublication.get();
+    public Optional<Publication> getPublicationById(int id) {
+        return publicationRepository.findById(id);
     }
 
 

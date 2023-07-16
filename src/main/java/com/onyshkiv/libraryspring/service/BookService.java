@@ -28,17 +28,15 @@ public class BookService {
         return bookRepository.findAll();
     }
 
-    public Book getBookByIsbn(String isbn) {
-        Optional<Book> optionalBook = bookRepository.findById(isbn);
-        if (optionalBook.isEmpty()) throw new BookNotFoundException("Not book with isbn " + isbn);
-        return optionalBook.get();
+    public Optional<Book> getBookByIsbn(String isbn) {
+        return bookRepository.findById(isbn);
     }
 
 
     @Transactional
     public Book saveBook(Book book) {
         Optional<Book> optionalBook = bookRepository.findById(book.getIsbn());
-        if (optionalBook.isPresent())
+        if (optionalBook.isPresent()||book.getIsbn().isBlank())
             throw new BookNotCreatedException("Book with isbn " + book.getIsbn() + " already exist");
         return bookRepository.save(book);
     }

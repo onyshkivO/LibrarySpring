@@ -3,6 +3,7 @@ package com.onyshkiv.libraryspring.controller;
 
 import com.onyshkiv.libraryspring.DTO.AuthorDTO;
 import com.onyshkiv.libraryspring.entity.Author;
+import com.onyshkiv.libraryspring.exception.author.AuthorNotFoundException;
 import com.onyshkiv.libraryspring.exception.author.AuthorNotSavedException;
 import com.onyshkiv.libraryspring.service.AuthorService;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/authors")
@@ -57,8 +59,10 @@ public class AuthorController {
 
     @GetMapping("/{id}")
     public ResponseEntity<AuthorDTO> getAuthorById(@PathVariable("id") int id) {
-        AuthorDTO author = convertToAuthorDTO(authorService.getAuthorById(id));
-        return new ResponseEntity<>(author, HttpStatus.OK);
+        Optional<Author> optionalAuthor = authorService.getAuthorById(id);
+        if (optionalAuthor.isEmpty())
+            throw new AuthorNotFoundException("Not author found with id " + id);
+        return new ResponseEntity<>(convertToAuthorDTO(optionalAuthor.get()), HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")

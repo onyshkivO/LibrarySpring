@@ -36,9 +36,9 @@ public class User{
     private String email;
 
     @Column(name = "password")
-    @NotBlank(message = "Bad password")
-    @NotNull(message = "Bad password")
-    @Pattern(regexp = "^[A-Za-z0-9_-]{6,18}$", message = "Bad password")
+    @NotBlank(message = "Bad password1")
+    @NotNull(message = "Bad password2")
+    //@Pattern(regexp = "^[A-Za-z0-9_-]{6,18}$", message = "Bad password3")
     private String password;
 
     @Column(name = "first_name")
@@ -64,7 +64,7 @@ public class User{
     @Column(name = "status_id")
     private UserStatus userStatus;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER)
     @JsonManagedReference("userActiveBook")
     private List<ActiveBook> activeBooks;
 

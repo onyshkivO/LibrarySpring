@@ -26,11 +26,8 @@ public class AuthorService {
     }
 
 
-    public Author getAuthorById(int id) {
-        Optional<Author> optionalAuthor = authorRepository.findById(id);
-        if (optionalAuthor.isEmpty())
-            throw new AuthorNotFoundException("Not author found with id " + id);//todo може то ліпше вертати оптіонал і вже в контроллері це робити
-        return optionalAuthor.get();
+    public Optional<Author> getAuthorById(int id) {
+        return authorRepository.findById(id);
 
     }
 

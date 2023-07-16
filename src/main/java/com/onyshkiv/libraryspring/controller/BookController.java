@@ -1,10 +1,11 @@
 package com.onyshkiv.libraryspring.controller;
 
-import com.onyshkiv.libraryspring.DTO.AuthorDTO;
 import com.onyshkiv.libraryspring.DTO.BookDTO;
 import com.onyshkiv.libraryspring.entity.Book;
 import com.onyshkiv.libraryspring.exception.book.BookNotCreatedException;
+import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.service.BookService;
+import com.onyshkiv.libraryspring.util.BookValidator;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,17 +15,20 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/books")
 public class BookController {
     private final BookService bookService;
     private final ModelMapper modelMapper;
+    private final BookValidator bookValidator;
 
     @Autowired
-    public BookController(BookService bookService, ModelMapper modelMapper) {
+    public BookController(BookService bookService, ModelMapper modelMapper, BookValidator bookValidator) {
         this.bookService = bookService;
         this.modelMapper = modelMapper;
+        this.bookValidator = bookValidator;
     }
 
     @GetMapping()
@@ -37,13 +41,15 @@ public class BookController {
     }
 
     @GetMapping("/{isbn}")
-    public ResponseEntity<Book> getBookByIsbn(@PathVariable("isbn") String isbn) {
-        Book book = bookService.getBookByIsbn(isbn);
-        return new ResponseEntity<>(book, HttpStatus.OK);
+    public ResponseEntity<BookDTO> getBookByIsbn(@PathVariable("isbn") String isbn) {
+        Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
+        if (optionalBook.isEmpty()) throw new BookNotFoundException("Not book with isbn " + isbn);
+        return new ResponseEntity<>(convertToBookDTO(optionalBook.get()), HttpStatus.OK);
     }
 
     @PostMapping()
     public ResponseEntity<BookDTO> saveBook(@RequestBody @Valid BookDTO book, BindingResult bindingResult) {
+        bookValidator.validate(book, bindingResult);
         if (bindingResult.hasErrors()) throw new BookNotCreatedException(bindingResult.getFieldErrors().toString());
         Book savedBook = bookService.saveBook(convertToBook(book));
         return new ResponseEntity<>(convertToBookDTO(savedBook), HttpStatus.OK);
@@ -52,7 +58,7 @@ public class BookController {
     @PatchMapping("/{isbn}")
     public ResponseEntity<BookDTO> updateBook(@PathVariable("isbn") String isbn, @RequestBody @Valid BookDTO book, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
-            throw new BookNotCreatedException(bindingResult.getFieldErrors().toString());//todo може то краще робити через ті валідатори
+            throw new BookNotCreatedException(bindingResult.getFieldErrors().toString());
         Book updatedBook = bookService.updateBook(isbn, convertToBook(book));
         return new ResponseEntity<>(convertToBookDTO(updatedBook), HttpStatus.OK);
     }
