@@ -1,9 +1,11 @@
 package com.onyshkiv.libraryspring.service;
 
 import com.onyshkiv.libraryspring.entity.ActiveBook;
+import com.onyshkiv.libraryspring.entity.Book;
 import com.onyshkiv.libraryspring.entity.SubscriptionStatus;
 import com.onyshkiv.libraryspring.exception.activeBook.ActiveBookNotSavedException;
 import com.onyshkiv.libraryspring.exception.activeBook.ActiveBookNotFoundException;
+import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.repository.ActiveBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,10 +21,13 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class ActiveBookService {
     private final ActiveBookRepository activeBookRepository;
+    private final BookService bookService;
+
 
     @Autowired
-    public ActiveBookService(ActiveBookRepository activeBookRepository) {
+    public ActiveBookService(ActiveBookRepository activeBookRepository, BookService bookService) {
         this.activeBookRepository = activeBookRepository;
+        this.bookService = bookService;
     }
 
     public List<ActiveBook> getAllActiveBooks() {
@@ -39,6 +44,16 @@ public class ActiveBookService {
         if (activeBook.getActiveBookId() != 0) {
             throw new ActiveBookNotSavedException("Active book with id " + activeBook.getActiveBookId() + " already exist");
         }
+
+        String isbn = activeBook.getBook().getIsbn();
+        Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
+        if (optionalBook.isEmpty())
+            throw new BookNotFoundException("There are not book with isbn "+isbn);
+
+        Book book = optionalBook.get();
+        book.setQuantity(book.getQuantity() - 1);
+        bookService.updateBook(book.getIsbn(), book);
+
         activeBook.setSubscriptionStatus(SubscriptionStatus.WAITING);
         activeBook.setStartDate(new Date());
         return activeBookRepository.save(activeBook);
@@ -60,7 +75,17 @@ public class ActiveBookService {
         Optional<ActiveBook> optionalActiveBook = activeBookRepository.findById(id);
         if (optionalActiveBook.isEmpty())
             throw new ActiveBookNotFoundException("There are no active book with id " + id);
+        ActiveBook activeBook = optionalActiveBook.get();
+        String isbn = activeBook.getBook().getIsbn();
+        Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
+        if (optionalBook.isEmpty())
+            throw new BookNotFoundException("There are not book with isbn "+isbn);
+
+        Book book = optionalBook.get();
+        book.setQuantity(book.getQuantity() + 1);
+        bookService.updateBook(book.getIsbn(), book);
+
         activeBookRepository.deleteById(id);
-        return optionalActiveBook.get();
+        return activeBook;
     }
 }

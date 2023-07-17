@@ -5,6 +5,7 @@ import com.onyshkiv.libraryspring.entity.ActiveBook;
 import com.onyshkiv.libraryspring.exception.activeBook.ActiveBookNotSavedException;
 import com.onyshkiv.libraryspring.exception.activeBook.ActiveBookNotFoundException;
 import com.onyshkiv.libraryspring.service.ActiveBookService;
+import com.onyshkiv.libraryspring.util.ActiveBookValidator;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,13 @@ import java.util.Optional;
 @RequestMapping("/activeBooks")
 public class ActiveBookController {
     private final ActiveBookService activeBookService;
+    private final ActiveBookValidator activeBookValidator;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public ActiveBookController(ActiveBookService activeBookService, ModelMapper modelMapper) {
+    public ActiveBookController(ActiveBookService activeBookService, ActiveBookValidator activeBookValidator, ModelMapper modelMapper) {
         this.activeBookService = activeBookService;
+        this.activeBookValidator = activeBookValidator;
         this.modelMapper = modelMapper;
     }
 
@@ -47,6 +50,7 @@ public class ActiveBookController {
 
     @PostMapping()
     public ResponseEntity<ActiveBookDTO> saveActiveBook(@RequestBody @Valid ActiveBookDTO activeBookDTO, BindingResult bindingResult) {
+        activeBookValidator.validate(activeBookDTO, bindingResult);
         if (bindingResult.hasErrors())
             throw new ActiveBookNotSavedException(bindingResult.getFieldErrors().toString());
         ActiveBook activeBook = activeBookService.saveActiveBook(convertToActiveBook(activeBookDTO));
