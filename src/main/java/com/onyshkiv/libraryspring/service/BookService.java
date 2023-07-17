@@ -5,6 +5,8 @@ import com.onyshkiv.libraryspring.exception.book.BookNotSavedException;
 import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +24,15 @@ public class BookService {
     }
 
 
-    //todo solve n+1 problem everywhere
-    public List<Book> getAllBooks() {
+    //todo solve n+1 problem everywhere і якраз як при йьому зробити пагінацію і сортування
+    public List<Book> getAllBooks(Integer page, Integer bookPerPage, String sortOption) {
+        if (page != null && sortOption != null) {
+            return bookRepository.findAll(PageRequest.of(page, bookPerPage, Sort.by(sortOption))).getContent();
+        } else if (page != null) {
+            return bookRepository.findAll(PageRequest.of(page, bookPerPage)).getContent();
+        } else if (sortOption != null) {
+            return bookRepository.findAll(Sort.by(sortOption));
+        }
         return bookRepository.findAll();
     }
 
@@ -35,7 +44,7 @@ public class BookService {
     @Transactional
     public Book saveBook(Book book) {
         Optional<Book> optionalBook = bookRepository.findById(book.getIsbn());
-        if (optionalBook.isPresent()||book.getIsbn().isBlank())
+        if (optionalBook.isPresent() || book.getIsbn().isBlank())
             throw new BookNotSavedException("Book with isbn " + book.getIsbn() + " already exist");
         return bookRepository.save(book);
     }

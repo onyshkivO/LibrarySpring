@@ -32,8 +32,9 @@ public class BookController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<BookDTO>> getAllBooks() {
-        List<BookDTO> books = bookService.getAllBooks()
+    public ResponseEntity<List<BookDTO>> getAllBooks(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "books_per_page", required = false) Integer bookPerPage,
+                                                     @RequestParam(value = "sort_option", required = false) String sortOption) {
+        List<BookDTO> books = bookService.getAllBooks(page,bookPerPage, sortOption)
                 .stream()
                 .map(this::convertToBookDTO)
                 .toList();
