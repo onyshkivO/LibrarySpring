@@ -48,7 +48,7 @@ public class ActiveBookService {
         String isbn = activeBook.getBook().getIsbn();
         Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
         if (optionalBook.isEmpty())
-            throw new BookNotFoundException("There are not book with isbn "+isbn);
+            throw new BookNotFoundException("There are not book with isbn " + isbn);
 
         Book book = optionalBook.get();
         book.setQuantity(book.getQuantity() - 1);
@@ -71,6 +71,31 @@ public class ActiveBookService {
     }
 
     @Transactional
+    public ActiveBook returnActiveBook(int activeBookId) {
+        Optional<ActiveBook> optionalActiveBook = activeBookRepository.findById(activeBookId);
+        if (optionalActiveBook.isEmpty())
+            throw new ActiveBookNotFoundException("There are not active book with id " + activeBookId);
+
+        ActiveBook activeBook = optionalActiveBook.get();
+        String isbn = activeBook.getBook().getIsbn();
+        Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
+        if (optionalBook.isEmpty())
+            throw new BookNotFoundException("There are not book with isbn " + isbn);//зайве напевно
+
+        Book book = optionalBook.get();
+        book.setQuantity(book.getQuantity() + 1);
+        bookService.updateBook(book.getIsbn(), book);
+
+
+
+        activeBookRepository.updateSubscriptionStatus(activeBookId);
+
+        activeBook.setSubscriptionStatus(SubscriptionStatus.RETURNED);
+        return activeBook;
+    }
+
+
+    @Transactional
     public ActiveBook deleteActiveBookById(int id) {
         Optional<ActiveBook> optionalActiveBook = activeBookRepository.findById(id);
         if (optionalActiveBook.isEmpty())
@@ -79,7 +104,7 @@ public class ActiveBookService {
         String isbn = activeBook.getBook().getIsbn();
         Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
         if (optionalBook.isEmpty())
-            throw new BookNotFoundException("There are not book with isbn "+isbn);
+            throw new BookNotFoundException("There are not book with isbn " + isbn);
 
         Book book = optionalBook.get();
         book.setQuantity(book.getQuantity() + 1);

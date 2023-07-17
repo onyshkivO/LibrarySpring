@@ -48,10 +48,13 @@ public class UserService {
         Optional<User> optionalUser = userRepository.findById(login);
         if (optionalUser.isEmpty())
             throw new UserNotFoundException("Not user found with login " + login);
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));//todo переробити, бо якщо до прикладу оновлюється статус, то як зробити?
-        user.setRole(optionalUser.get().getRole());
-        user.setUserStatus(optionalUser.get().getUserStatus());
+        //todo якась хєрня
+        if (!passwordEncoder.matches(user.getPassword(), optionalUser.get().getPassword()))
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getRole() == null)
+            user.setRole(optionalUser.get().getRole());
+        if (user.getUserStatus() == null)
+            user.setUserStatus(optionalUser.get().getUserStatus());
         return userRepository.save(user);
     }
 

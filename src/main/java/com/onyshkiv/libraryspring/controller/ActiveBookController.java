@@ -66,6 +66,12 @@ public class ActiveBookController {
         return new ResponseEntity<>(convertToActiveBookDTO(activeBook), HttpStatus.OK);
     }
 
+    @PatchMapping("/return/{id}")
+    public ResponseEntity<ActiveBookDTO> returnActiveBook(@PathVariable("id") int id) {
+        ActiveBook activeBook = activeBookService.returnActiveBook(id);
+        return new ResponseEntity<>(convertToActiveBookDTO(activeBook), HttpStatus.OK);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ActiveBookDTO> deleteActiveBookById(@PathVariable("id") int id) {
         ActiveBook activeBook = activeBookService.deleteActiveBookById(id);
