@@ -1,5 +1,6 @@
 package com.onyshkiv.libraryspring.service;
 
+import com.onyshkiv.libraryspring.DTO.BookDTO;
 import com.onyshkiv.libraryspring.entity.Author;
 import com.onyshkiv.libraryspring.entity.Book;
 import com.onyshkiv.libraryspring.entity.Publication;
@@ -13,8 +14,10 @@ import com.onyshkiv.libraryspring.repository.PublicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 import java.util.Optional;
@@ -94,6 +97,8 @@ public class BookService {
     public List<Book> findBooksByName(String name) {
         return bookRepository.getBooksByNameStartingWith(name);
     }
+
+
 
 
 }

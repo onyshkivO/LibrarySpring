@@ -19,8 +19,7 @@ public class MyUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-//        return Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
-        return Collections.singletonList(new SimpleGrantedAuthority(user.getEmail()));
+       return Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name()));
     }
 
     @Override
@@ -35,14 +34,12 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-//        return user.getUserStatus().equals(UserStatus.ACTIVE);
-        return true;
+        return user.getUserStatus().equals(UserStatus.ACTIVE);
     }
 
     @Override
     public boolean isAccountNonLocked() {
-//        return user.getUserStatus().equals(UserStatus.ACTIVE);
-        return true;
+        return user.getUserStatus().equals(UserStatus.ACTIVE);
     }
 
     @Override
@@ -52,9 +49,6 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-
-
-//        return user.getUserStatus().equals(UserStatus.ACTIVE);
-        return true;
+        return user.getUserStatus().equals(UserStatus.ACTIVE);
     }
 }
