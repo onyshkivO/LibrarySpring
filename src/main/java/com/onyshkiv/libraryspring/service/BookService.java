@@ -91,5 +91,9 @@ public class BookService {
         return bookRepository.getBooksByPublicationPublicationId(id);
     }
 
+    public List<Book> findBooksByName(String name) {
+        return bookRepository.getBooksByNameStartingWith(name);
+    }
+
 
 }

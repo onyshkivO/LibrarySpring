@@ -53,6 +53,12 @@ public class BookController {
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Book>> getBooksByName(@RequestParam(value = "name", required = false) String name) {
+        List<Book> books = bookService.findBooksByName(name);
+        return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
     @GetMapping("/{isbn}")
     public ResponseEntity<BookDTO> getBookByIsbn(@PathVariable("isbn") String isbn) {
         Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
