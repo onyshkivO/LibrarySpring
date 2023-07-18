@@ -48,6 +48,15 @@ public class ActiveBookController {
         return new ResponseEntity<>(convertToActiveBookDTO(optionalActiveBook.get()), HttpStatus.OK);
     }
 
+    @GetMapping("/user/{login}")
+    public ResponseEntity<List<ActiveBookDTO>> getActiveBooksByUserLogin(@PathVariable("login") String login) {
+        List<ActiveBookDTO> activeBooks = activeBookService.getActiveBooksByUserLogin(login)
+                .stream()
+                .map(this::convertToActiveBookDTO)
+                .toList();
+        return new ResponseEntity<>(activeBooks, HttpStatus.OK);
+    }
+
     @PostMapping()
     public ResponseEntity<ActiveBookDTO> saveActiveBook(@RequestBody @Valid ActiveBookDTO activeBookDTO, BindingResult bindingResult) {
         activeBookValidator.validate(activeBookDTO, bindingResult);

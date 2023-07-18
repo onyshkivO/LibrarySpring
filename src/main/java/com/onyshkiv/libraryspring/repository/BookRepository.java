@@ -13,4 +13,5 @@ public interface BookRepository extends JpaRepository<Book, String> {
     List<Book> getBooksByPublicationPublicationId(int id);
 
     List<Book> getBooksByNameStartingWith(String name);
+
 }

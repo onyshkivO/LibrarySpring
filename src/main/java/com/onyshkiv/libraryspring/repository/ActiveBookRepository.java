@@ -6,9 +6,14 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ActiveBookRepository extends JpaRepository<ActiveBook,Integer> {
     @Modifying
     @Query("UPDATE ActiveBook SET subscriptionStatus = 2 WHERE activeBookId = ?1")
     int updateSubscriptionStatus(int activeBookId);
+
+
+    List<ActiveBook> getActiveBooksByUserLogin(String login);
 }

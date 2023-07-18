@@ -42,20 +42,30 @@ public class BookController {
     }
 
     @GetMapping("/author/{id}")
-    public ResponseEntity<List<Book>> getBooksByAuthorId(@PathVariable("id") int id) {
-        List<Book> books = bookService.findBooksByAuthor(id);
+    public ResponseEntity<List<BookDTO>> getBooksByAuthorId(@PathVariable("id") int id) {
+        List<BookDTO> books = bookService.findBooksByAuthor(id)
+                .stream()
+                .map(this::convertToBookDTO)
+                .toList();
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/publication/{id}")
-    public ResponseEntity<List<Book>> getBooksByPublicationId(@PathVariable("id") int id) {
-        List<Book> books = bookService.findBooksByPublication(id);
+    public ResponseEntity<List<BookDTO>> getBooksByPublicationId(@PathVariable("id") int id) {
+        List<BookDTO> books = bookService.findBooksByPublication(id)
+                .stream()
+                .map(this::convertToBookDTO)
+                .toList();
+        ;
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<Book>> getBooksByName(@RequestParam(value = "name", required = false) String name) {
-        List<Book> books = bookService.findBooksByName(name);
+    public ResponseEntity<List<BookDTO>> getBooksByName(@RequestParam(value = "name", required = false) String name) {
+        List<BookDTO> books = bookService.findBooksByName(name)
+                .stream()
+                .map(this::convertToBookDTO)
+                .toList();
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 

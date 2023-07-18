@@ -3,9 +3,11 @@ package com.onyshkiv.libraryspring.service;
 import com.onyshkiv.libraryspring.entity.ActiveBook;
 import com.onyshkiv.libraryspring.entity.Book;
 import com.onyshkiv.libraryspring.entity.SubscriptionStatus;
+import com.onyshkiv.libraryspring.entity.User;
 import com.onyshkiv.libraryspring.exception.activeBook.ActiveBookNotSavedException;
 import com.onyshkiv.libraryspring.exception.activeBook.ActiveBookNotFoundException;
 import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
+import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
 import com.onyshkiv.libraryspring.repository.ActiveBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,12 +23,14 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class ActiveBookService {
     private final ActiveBookRepository activeBookRepository;
+    private final UserService userService;
     private final BookService bookService;
 
 
     @Autowired
-    public ActiveBookService(ActiveBookRepository activeBookRepository, BookService bookService) {
+    public ActiveBookService(ActiveBookRepository activeBookRepository, UserService userService, BookService bookService) {
         this.activeBookRepository = activeBookRepository;
+        this.userService = userService;
         this.bookService = bookService;
     }
 
@@ -36,6 +40,12 @@ public class ActiveBookService {
 
     public Optional<ActiveBook> getActiveBookById(int id) {
         return activeBookRepository.findById(id);
+    }
+
+    public List<ActiveBook> getActiveBooksByUserLogin(String login) {
+        Optional<User> optionalUser = userService.getUserByLogin(login);
+        if (optionalUser.isEmpty()) throw new UserNotFoundException("There are not user with login " + login);
+        return activeBookRepository.getActiveBooksByUserLogin(login);
     }
 
 
@@ -85,7 +95,6 @@ public class ActiveBookService {
         Book book = optionalBook.get();
         book.setQuantity(book.getQuantity() + 1);
         bookService.updateBook(book.getIsbn(), book);
-
 
 
         activeBookRepository.updateSubscriptionStatus(activeBookId);
