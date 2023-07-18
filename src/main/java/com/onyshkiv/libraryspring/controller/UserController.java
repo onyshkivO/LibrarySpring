@@ -58,6 +58,15 @@ public class UserController {
         return new ResponseEntity<>(convertToUserDTO(user), HttpStatus.OK);
     }
 
+    @PostMapping("/librarian")
+    public ResponseEntity<UserDTO> createLibrarian(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
+        userValidator.validate(userDTO, bindingResult);
+        if (bindingResult.hasErrors()) throw new UserNotSavedException(bindingResult.getFieldErrors().toString());
+        User user = userService.saveUser(convertAToUser(userDTO), Role.ROLE_LIBRARIAN);
+        return new ResponseEntity<>(convertToUserDTO(user), HttpStatus.OK);
+    }
+
+
     @PatchMapping("/{login}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable("login") String login, @RequestBody @Valid UserDTO userDTO,
                                               BindingResult bindingResult) {
