@@ -34,10 +34,22 @@ public class BookController {
     @GetMapping()
     public ResponseEntity<List<BookDTO>> getAllBooks(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "books_per_page", required = false) Integer bookPerPage,
                                                      @RequestParam(value = "sort_option", required = false) String sortOption) {
-        List<BookDTO> books = bookService.getAllBooks(page,bookPerPage, sortOption)
+        List<BookDTO> books = bookService.getAllBooks(page, bookPerPage, sortOption)
                 .stream()
                 .map(this::convertToBookDTO)
                 .toList();
+        return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
+    @GetMapping("/author/{id}")
+    public ResponseEntity<List<Book>> getBooksByAuthorId(@PathVariable("id") int id) {
+        List<Book> books = bookService.findBooksByAuthor(id);
+        return new ResponseEntity<>(books, HttpStatus.OK);
+    }
+
+    @GetMapping("/publication/{id}")
+    public ResponseEntity<List<Book>> getBooksByPublicationId(@PathVariable("id") int id) {
+        List<Book> books = bookService.findBooksByPublication(id);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
