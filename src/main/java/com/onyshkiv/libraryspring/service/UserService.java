@@ -67,5 +67,20 @@ public class UserService {
         return optionalUser.get();
     }
 
+    @Transactional
+    public User changeUserStatus(String login){
+        Optional<User> optionalUser = userRepository.findById(login);
+        if (optionalUser.isEmpty()) throw new UserNotFoundException("There are not user with login "+ login);
+        User user = optionalUser.get();
+        if (user.getUserStatus().equals(UserStatus.ACTIVE)) {
+            user.setUserStatus(UserStatus.BLOCKED);
+        } else {
+            user.setUserStatus(UserStatus.ACTIVE);
+        }
+        return user;
+
+
+    }
+
 
 }

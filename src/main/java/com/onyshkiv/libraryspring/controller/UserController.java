@@ -72,6 +72,13 @@ public class UserController {
         return new ResponseEntity<>(convertToUserDTO(user), HttpStatus.OK);
     }
 
+    @PatchMapping("/status/{login}")
+    public ResponseEntity<UserDTO> changeUserStatus(@PathVariable("login") String login) {
+        User user = userService.changeUserStatus(login);
+        return new ResponseEntity<>(convertToUserDTO(user), HttpStatus.OK);
+
+    }
+
     private UserDTO convertToUserDTO(User user) {
         return modelMapper.map(user, UserDTO.class);
     }
