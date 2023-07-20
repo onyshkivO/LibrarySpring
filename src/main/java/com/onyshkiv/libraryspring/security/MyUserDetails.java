@@ -34,12 +34,12 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return user.getUserStatus().equals(UserStatus.ACTIVE);
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return user.getUserStatus().equals(UserStatus.ACTIVE);
+        return true;
     }
 
     @Override
@@ -49,6 +49,6 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.getUserStatus().equals(UserStatus.ACTIVE);
+        return true;
     }
 }

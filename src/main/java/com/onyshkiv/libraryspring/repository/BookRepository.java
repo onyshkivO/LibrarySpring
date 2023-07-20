@@ -15,6 +15,8 @@ public interface BookRepository extends JpaRepository<Book, String> {
 
     @Query(value = "SELECT b from Book b left join fetch b.authors left join fetch b.publication")
     Page<Book> findAll(Pageable pageable);
+    @Query(value = "SELECT b from Book b left join fetch b.authors left join fetch b.publication")
+    List<Book> findAll();
 
     List<Book> getBooksByAuthorsAuthorId(int id);
 

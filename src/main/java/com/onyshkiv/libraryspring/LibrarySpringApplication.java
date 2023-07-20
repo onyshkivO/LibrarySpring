@@ -33,6 +33,6 @@ public class LibrarySpringApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         //bookRepository.getAll(PageRequest.of(0, 1));
-        System.out.println(userRepository.findById("user1").get().getRole());
+       // System.out.println(userRepository.findById("user1").get().getRole());
     }
 }
