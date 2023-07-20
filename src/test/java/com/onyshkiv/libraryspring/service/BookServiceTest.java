@@ -9,7 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
 import java.util.List;
@@ -43,6 +47,20 @@ public class BookServiceTest {
         Book book2 = Book.builder().isbn("9780312850045").name("test12").dateOfPublication(new Date()).quantity(2).build();
         when(bookRepository.findAll()).thenReturn(List.of(book, book2));
         List<Book> books = bookService.getAllBooks(null, null, null);
+        Assertions.assertNotNull(books);
+        Assertions.assertEquals(book, books.get(0));
+        Assertions.assertEquals(book2, books.get(1));
+    }
+
+    @Test
+    public void BookService_getAllBooksPageTest() {
+        Book book = Book.builder().isbn("9780312850098").name("test").dateOfPublication(new Date()).quantity(1).build();
+        Book book2 = Book.builder().isbn("9780312850045").name("test12").dateOfPublication(new Date()).quantity(2).build();
+        //Page<Book> bookPage  = Mockito.mock(Page.class);
+        Page<Book> pagedResponse = new PageImpl(List.of(book,book2));
+        when(bookRepository.findAll(Mockito.any(Pageable.class))).thenReturn(pagedResponse);
+        List<Book> books = bookService.getAllBooks(0, 2, null);
+
         Assertions.assertNotNull(books);
         Assertions.assertEquals(book, books.get(0));
         Assertions.assertEquals(book2, books.get(1));
