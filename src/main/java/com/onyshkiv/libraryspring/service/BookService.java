@@ -37,7 +37,6 @@ public class BookService {
     }
 
 
-    //todo solve n+1 problem everywhere і якраз як при йьому зробити пагінацію і сортування
     public List<Book> getAllBooks(Integer page, Integer bookPerPage, String sortOption) {
         if (page != null && sortOption != null) {
             return bookRepository.findAll(PageRequest.of(page, bookPerPage, Sort.by(sortOption))).getContent();
