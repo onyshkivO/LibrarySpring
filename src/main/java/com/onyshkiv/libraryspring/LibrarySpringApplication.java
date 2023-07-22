@@ -12,14 +12,14 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class LibrarySpringApplication implements CommandLineRunner {
 
-    private final BookRepository bookRepository;
-    private final UserRepository userRepository;
+   // private final BookRepository bookRepository;
+   // private final UserRepository userRepository;
 
-    @Autowired
-    public LibrarySpringApplication(BookRepository bookRepository, UserRepository userRepository) {
-        this.bookRepository = bookRepository;
-        this.userRepository = userRepository;
-    }
+//    @Autowired
+//    public LibrarySpringApplication(BookRepository bookRepository, UserRepository userRepository) {
+//        this.bookRepository = bookRepository;
+//        this.userRepository = userRepository;
+//    }
 
     public static void main(String[] args) {
         SpringApplication.run(LibrarySpringApplication.class, args);

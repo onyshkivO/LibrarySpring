@@ -32,6 +32,7 @@ public class BookController {
         this.bookValidator = bookValidator;
     }
 
+
     @GetMapping()
     public ResponseEntity<List<BookDTO>> getAllBooks(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "books_per_page", required = false) Integer bookPerPage,
                                                      @RequestParam(value = "sort_option", required = false) String sortOption) {
@@ -57,7 +58,6 @@ public class BookController {
                 .stream()
                 .map(this::convertToBookDTO)
                 .toList();
-        ;
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
