@@ -33,6 +33,11 @@ public class UserController {
         this.userValidator = userValidator;
     }
 
+    @GetMapping("/success")
+    public String logout(){
+        return "you successfully logged out!";
+    }
+
     @GetMapping()
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         List<UserDTO> users = userService.getAllUsers()
