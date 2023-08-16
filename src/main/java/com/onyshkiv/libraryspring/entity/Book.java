@@ -23,7 +23,7 @@ import java.util.List;
 @Table(name = "book")
 public class Book {
     @Id
-    @Column(name = "isbn")
+    @Column(name = "isbn",length = 30)
     @NotNull(message = "Bad book isbn")
     @Pattern(regexp = "^(?=(?:\\D?\\d){10}(?:(?:\\D?\\d){3})?$)[\\d-]+?$",message = "Bad book isbn")
     private String isbn;
@@ -42,13 +42,10 @@ public class Book {
     @NotNull(message = "Bad quantity value")
     private Integer quantity;
 
-
-
-    @Column(name = "details")
+    @Column(name = "details",length = 1000)
     private String details;
 
     @OneToMany(mappedBy = "book")
-    //@JsonBackReference("bookActiveBook")
     @JsonIgnoreProperties("book")
     private List<ActiveBook> activeBooks;
 
