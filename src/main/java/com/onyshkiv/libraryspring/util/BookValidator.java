@@ -24,8 +24,9 @@ public class BookValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         BookDTO book = (BookDTO) target;
-        if (bookService.getBookByIsbn(book.getIsbn()).isPresent())
+        if (bookService.getBookByIsbn(book.getIsbn()).isPresent()) {
             errors.rejectValue("isbn", "", "Book with isbn " + book.getIsbn() + " already exist");
+        }
 
     }
 }

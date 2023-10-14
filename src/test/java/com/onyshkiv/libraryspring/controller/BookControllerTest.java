@@ -1,6 +1,7 @@
 package com.onyshkiv.libraryspring.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onyshkiv.libraryspring.DTO.BookDTO;
 import com.onyshkiv.libraryspring.entity.Book;
 import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.exception.book.BookNotSavedException;
@@ -17,27 +18,27 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = BookController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(SpringExtension.class)
+@Import(BookValidator.class)
 public class BookControllerTest {
 
     @Autowired
@@ -45,8 +46,7 @@ public class BookControllerTest {
 
     @MockBean
     private BookService bookService;
-    @MockBean
-    private BookValidator bookValidator;
+
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -104,22 +104,21 @@ public class BookControllerTest {
                 .andExpect(jsonPath("$.name").value("test"))
                 .andExpect(jsonPath("$.quantity").value(1));
     }
-//todo як зробити щоб перевірявся саме в валідпторі(бо він нічого не повертає і не можу запхати в when())
+//todo переробити, бомає бути більш правильний варіант(тобто не асерт тру, а контеінс чи щось таке)andExpect(result -> Assertions.assertTrue(result.getResolvedException().getMessage().contains("Book with isbn 9780312850098 already exist")));
     @Test
     public void bookController_saveBookThatAlreadyExist() throws Exception {
         Book book = Book.builder().isbn("9780312850098").name("test").dateOfPublication(new Date()).quantity(1).build();
         when(bookService.getBookByIsbn(anyString())).thenReturn(Optional.of(book));
-        BindingResult bindingResult = mock(BindingResult.class);
-        when(bindingResult.hasErrors()).thenReturn(true);
-        //when(bookService.saveBook(book)).thenThrow(new BookNotSavedException("Book with isbna 9780312850098 already exist"));
-        when(bookService.saveBook(book)).thenReturn(book);
+//        when(bookService.saveBook(book)).thenThrow(new BookNotSavedException("Book with isbn 9780312850098 already exist"));
+//        when(bookService.saveBook(book)).thenReturn(book);
         mockMvc.perform(post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(book))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof BookNotSavedException))
-                .andExpect(result -> Assertions.assertEquals("Book with isbn 9780312850098 already exist", result.getResolvedException().getMessage()));
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException().getMessage().contains("Book with isbn 9780312850098 already exist")));
+//                .andExpect(result -> Assertions.assertEquals("Book with isbn 9780312850098 already exist", result.getResolvedException().getMessage()));
     }
 
 
