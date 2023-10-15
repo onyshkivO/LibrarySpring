@@ -3,9 +3,8 @@ package com.onyshkiv.libraryspring.repository;
 import com.onyshkiv.libraryspring.entity.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,13 +12,16 @@ import java.util.List;
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
 
-    @Query(value = "SELECT b from Book b left join fetch b.authors left join fetch b.publication")
+    @EntityGraph(attributePaths = {"authors","activeBooks"})
     Page<Book> findAll(Pageable pageable);
 
-    List<Book> getBooksByAuthorsAuthorId(int id);
+    @EntityGraph(attributePaths = {"authors","activeBooks"})
+    Page<Book> getBooksByAuthorsAuthorId(int id, Pageable pageable);
 
-    List<Book> getBooksByPublicationPublicationId(int id);
+    @EntityGraph(attributePaths = {"authors","activeBooks"})
+    Page<Book> getBooksByPublicationPublicationId(int id, Pageable pageable);
 
-    List<Book> getBooksByNameStartingWith(String name);
+    @EntityGraph(attributePaths = {"authors","activeBooks"})
+    Page<Book> getBooksByNameStartingWith(String name, Pageable pageable);
 
 }

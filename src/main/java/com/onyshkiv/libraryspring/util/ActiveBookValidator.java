@@ -1,9 +1,7 @@
 package com.onyshkiv.libraryspring.util;
 
-import com.onyshkiv.libraryspring.DTO.ActiveBookDTO;
-import com.onyshkiv.libraryspring.DTO.BookDTO;
+import com.onyshkiv.libraryspring.entity.ActiveBook;
 import com.onyshkiv.libraryspring.entity.Book;
-import com.onyshkiv.libraryspring.service.ActiveBookService;
 import com.onyshkiv.libraryspring.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,12 +22,12 @@ public class ActiveBookValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return ActiveBookDTO.class.equals(clazz);
+        return ActiveBook.class.equals(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        ActiveBookDTO activeBook = (ActiveBookDTO) target;
+        ActiveBook activeBook = (ActiveBook) target;
         String bookIsbn = activeBook.getBook().getIsbn();
         Optional<Book> optionalBook = bookService.getBookByIsbn(bookIsbn);
         if (optionalBook.isEmpty() || optionalBook.get().getQuantity() < 1)

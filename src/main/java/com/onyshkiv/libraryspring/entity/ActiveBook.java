@@ -1,13 +1,12 @@
 package com.onyshkiv.libraryspring.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Data
@@ -18,33 +17,36 @@ public class ActiveBook {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "active_book_id")
-    private int activeBookId;
+    @JsonView(Views.Id.class)
+    private int id;
 
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     @Column(name = "subscription_status_id")
+    @JsonView(Views.Full.class)
     private SubscriptionStatus subscriptionStatus;
 
-    @Temporal(TemporalType.DATE)
-    //    @DateTimeFormat(pattern = "dd/MM/yyyy")
     @Column(name = "start_date")
-    private Date startDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonView(Views.Full.class)
+    private LocalDate startDate;
 
-    @Temporal(TemporalType.DATE)
-    //    @DateTimeFormat(pattern = "dd/MM/yyyy")
+
     @Column(name = "end_date")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonView(Views.Full.class)
     private Date endDate;
 
     @Column(name = "fine")
+    @JsonView(Views.Full.class)
     private Double fine;
 
     @ManyToOne
     @JoinColumn(name = "user_login", referencedColumnName = "login")
-   @JsonBackReference("userActiveBook")
+    @JsonView(Views.Full.class)
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "book_isbn", referencedColumnName = "isbn")
-    //@JsonManagedReference("bookActiveBook")
-    @JsonIgnoreProperties("activeBooks")
+    @JsonView(Views.Full.class)
     private Book book;
 }

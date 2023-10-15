@@ -1,111 +1,104 @@
 package com.onyshkiv.libraryspring.controller;
 
-import com.onyshkiv.libraryspring.DTO.BookDTO;
+
+import com.fasterxml.jackson.annotation.JsonView;
 import com.onyshkiv.libraryspring.entity.Book;
+import com.onyshkiv.libraryspring.entity.Views;
 import com.onyshkiv.libraryspring.exception.book.BookNotSavedException;
-import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.service.BookService;
 import com.onyshkiv.libraryspring.util.BookValidator;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/books")
 public class BookController {
     private final BookService bookService;
-    private final ModelMapper modelMapper;
+
     private final BookValidator bookValidator;
 
     @Autowired
-    public BookController(BookService bookService, ModelMapper modelMapper, BookValidator bookValidator) {
+    public BookController(BookService bookService, BookValidator bookValidator) {
         this.bookService = bookService;
-        this.modelMapper = modelMapper;
+
         this.bookValidator = bookValidator;
     }
 
     @GetMapping()
-    public ResponseEntity<List<BookDTO>> getAllBooks(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "books_per_page", required = false) Integer bookPerPage,
-                                                     @RequestParam(value = "sort_option", required = false) String sortOption) {
-        List<BookDTO> books = bookService.getAllBooks(page, bookPerPage, sortOption)
-                .stream()
-                .map(this::convertToBookDTO)
-                .toList();
+    @JsonView(Views.Full.class)
+    public ResponseEntity<Page<Book>> getAllBooks(@PageableDefault Pageable pageable) {
+        Page<Book> books = bookService.getAllBooks(pageable);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
+
+    //todo якщо я просто хотів книжки якогось автора то можна просто метод getBooks викликати відповідного автора чи публікації
     @GetMapping("/author/{id}")
-    public ResponseEntity<List<BookDTO>> getBooksByAuthorId(@PathVariable("id") int id) {
-        List<BookDTO> books = bookService.findBooksByAuthor(id)
-                .stream()
-                .map(this::convertToBookDTO)
-                .toList();
+    @JsonView(Views.Full.class)
+    public ResponseEntity<Page<Book>> getBooksByAuthorId(@PathVariable("id") int id, @PageableDefault Pageable pageable) {
+        Page<Book> books = bookService.findBooksByAuthor(id, pageable);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/publication/{id}")
-    public ResponseEntity<List<BookDTO>> getBooksByPublicationId(@PathVariable("id") int id) {
-        List<BookDTO> books = bookService.findBooksByPublication(id)
-                .stream()
-                .map(this::convertToBookDTO)
-                .toList();
-        ;
+    @JsonView(Views.IdName.class)
+    public ResponseEntity<Page<Book>> getBooksByPublicationId(@PathVariable("id") int id, @PageableDefault Pageable pageable) {
+        Page<Book> books = bookService.findBooksByPublication(id, pageable);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<BookDTO>> getBooksByName(@RequestParam(value = "name", required = false) String name) {
-        List<BookDTO> books = bookService.findBooksByName(name)
-                .stream()
-                .map(this::convertToBookDTO)
-                .toList();
+    @JsonView(Views.Full.class)
+    public ResponseEntity<Page<Book>> getBooksByName(@RequestParam(value = "name", required = false) String name, @PageableDefault Pageable pageable) {
+        Page<Book> books = bookService.findBooksByName(name, pageable);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/{isbn}")
-    public ResponseEntity<BookDTO> getBookByIsbn(@PathVariable("isbn") String isbn) {
-        Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
-        if (optionalBook.isEmpty()) throw new BookNotFoundException("Not book with isbn " + isbn);
-        return new ResponseEntity<>(convertToBookDTO(optionalBook.get()), HttpStatus.OK);
+    @JsonView(Views.Full.class)
+    public ResponseEntity<Book> getBookByIsbn(@PathVariable("isbn") Book book) {
+//        Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
+//        if (optionalBook.isEmpty()) throw new BookNotFoundException("Not book with isbn " + isbn);
+        //todo може тут якусь перевірку(ну і у всіх контроллерах)
+
+        return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
+    //todo перевірити що буде, якщо там не задати авторів або/і публікацію
     @PostMapping()
-    public ResponseEntity<BookDTO> saveBook(@RequestBody @Valid BookDTO book, BindingResult bindingResult) {
+    @JsonView(Views.Full.class)
+    public ResponseEntity<Book> saveBook(@RequestBody @Valid Book book, BindingResult bindingResult) {
         bookValidator.validate(book, bindingResult);
         if (bindingResult.hasErrors()) throw new BookNotSavedException(bindingResult.getFieldErrors().toString());
-        Book savedBook = bookService.saveBook(convertToBook(book));
-        return new ResponseEntity<>(convertToBookDTO(savedBook), HttpStatus.OK);
+        Book savedBook = bookService.saveBook(book);
+        return new ResponseEntity<>(savedBook, HttpStatus.OK);
     }
 
-    @PatchMapping("/{isbn}")
-    public ResponseEntity<BookDTO> updateBook(@PathVariable("isbn") String isbn, @RequestBody @Valid BookDTO book, BindingResult bindingResult) {
+
+    //todo розібратися з тими валідаторами, чи треба їх в update щоб проблем з id не було(типу просто оновлюєш, а воно каже таке id вже є)
+    @PutMapping("/{isbn}")
+    @JsonView(Views.Full.class)
+    public ResponseEntity<Book> updateBook(@PathVariable("isbn") Book bookFromDb, @RequestBody @Valid Book book, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new BookNotSavedException(bindingResult.getFieldErrors().toString());
-        Book updatedBook = bookService.updateBook(isbn, convertToBook(book));
-        return new ResponseEntity<>(convertToBookDTO(updatedBook), HttpStatus.OK);
+
+        Book updatedBook = bookService.updateBook(bookFromDb, book);
+        return new ResponseEntity<>(updatedBook, HttpStatus.OK);
     }
 
     @DeleteMapping("/{isbn}")
-    public ResponseEntity<BookDTO> deleteBookByIsbn(@PathVariable("isbn") String isbn) {
-        Book book = bookService.deleteBookByIsbn(isbn);
-        return new ResponseEntity<>(convertToBookDTO(book), HttpStatus.OK);
+    @JsonView(Views.IdName.class)
+    public ResponseEntity<Book> deleteBookByIsbn(@PathVariable("isbn") Book book) {
+        bookService.delete(book);
+        return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
-
-    private BookDTO convertToBookDTO(Book book) {
-        return modelMapper.map(book, BookDTO.class);
-    }
-
-    private Book convertToBook(BookDTO bookDTO) {
-        return modelMapper.map(bookDTO, Book.class);
-    }
 
 }

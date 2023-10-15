@@ -5,6 +5,8 @@ import com.onyshkiv.libraryspring.exception.author.AuthorNotFoundException;
 import com.onyshkiv.libraryspring.exception.author.AuthorNotSavedException;
 import com.onyshkiv.libraryspring.repository.AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,8 +23,8 @@ public class AuthorService {
         this.authorRepository = authorRepository;
     }
 
-    public List<Author> getAllAuthors() {
-        return authorRepository.findAll();
+    public Page<Author> getAllAuthors(Pageable pageable) {
+        return authorRepository.findAll(pageable);
     }
 
 
@@ -33,17 +35,18 @@ public class AuthorService {
 
     @Transactional
     public Author saveAuthor(Author author) {
-        if (author.getAuthorId() != 0)
-            throw new AuthorNotSavedException("Author with id " + author.getAuthorId() + " already exist");
+        if (author.getId() != 0)
+            throw new AuthorNotSavedException("Author with id " + author.getId() + " already exist");
         return authorRepository.save(author);
     }
 
     @Transactional
-    public Author updateAuthor(Integer id, Author author) {
-        Optional<Author> optionalAuthor = authorRepository.findById(id);
-        if (optionalAuthor.isEmpty())
-            throw new AuthorNotFoundException("Not author found with id " + id);
-        author.setAuthorId(id);
+    public Author updateAuthor(Author authorFromDb, Author author) {
+//        Optional<Author> optionalAuthor = authorRepository.findById(id);
+//        if (optionalAuthor.isEmpty())
+//            throw new AuthorNotFoundException("Not author found with id " + id);
+//        author.setId(id);
+        authorFromDb.setName(author.getName());
         return authorRepository.save(author);
     }
 
@@ -54,5 +57,12 @@ public class AuthorService {
             throw new AuthorNotFoundException("Not author found with id " + id);
         authorRepository.deleteById(id);
         return optionalAuthor.get();
+    }
+    @Transactional
+    public void delete(Author author) {
+        //хз може треба цю перевірку
+//        if (author==null)
+//            throw new AuthorNotFoundException("Not author found with id ");
+        authorRepository.delete(author);
     }
 }

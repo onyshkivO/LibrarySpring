@@ -9,10 +9,14 @@ import com.onyshkiv.libraryspring.exception.activeBook.ActiveBookNotFoundExcepti
 import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
 import com.onyshkiv.libraryspring.repository.ActiveBookRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -34,25 +38,25 @@ public class ActiveBookService {
         this.bookService = bookService;
     }
 
-    public List<ActiveBook> getAllActiveBooks() {
-        return activeBookRepository.findAll();
+    public Page<ActiveBook> getAllActiveBooks(Pageable pageable) {
+        return activeBookRepository.findAll(pageable);
     }
 
     public Optional<ActiveBook> getActiveBookById(int id) {
         return activeBookRepository.findById(id);
     }
 
-    public List<ActiveBook> getActiveBooksByUserLogin(String login) {
-        Optional<User> optionalUser = userService.getUserByLogin(login);
-        if (optionalUser.isEmpty()) throw new UserNotFoundException("There are not user with login " + login);
-        return activeBookRepository.getActiveBooksByUserLogin(login);
+    public Page<ActiveBook> getActiveBooksByUserLogin(String login, Pageable pageable) {
+//        Optional<User> optionalUser = userService.getUserByLogin(login);
+//        if (optionalUser.isEmpty()) throw new UserNotFoundException("There are not user with login " + login);
+        return activeBookRepository.getActiveBooksByUserLogin(login, pageable);
     }
 
 
     @Transactional
     public ActiveBook saveActiveBook(ActiveBook activeBook) {
-        if (activeBook.getActiveBookId() != 0) {
-            throw new ActiveBookNotSavedException("Active book with id " + activeBook.getActiveBookId() + " already exist");
+        if (activeBook.getId() != 0) {
+            throw new ActiveBookNotSavedException("Active book with id " + activeBook.getId() + " already exist");
         }
 
         String isbn = activeBook.getBook().getIsbn();
@@ -62,31 +66,36 @@ public class ActiveBookService {
 
         Book book = optionalBook.get();
         book.setQuantity(book.getQuantity() - 1);
-        bookService.updateBook(book.getIsbn(), book);
+        bookService.updateBook(book, book);
 
         activeBook.setSubscriptionStatus(SubscriptionStatus.WAITING);
-        activeBook.setStartDate(new Date());
+        activeBook.setStartDate(LocalDate.now());
         return activeBookRepository.save(activeBook);
     }
 
     @Transactional
-    public ActiveBook updateActiveBook(Integer id, ActiveBook activeBook) {
-        Optional<ActiveBook> optionalActiveBook = activeBookRepository.findById(id);
-        if (optionalActiveBook.isEmpty())
-            throw new ActiveBookNotFoundException("There are no active book with id " + id);
-        activeBook.setActiveBookId(id);
-        activeBook.setSubscriptionStatus(SubscriptionStatus.WAITING);
-        activeBook.setStartDate(new Date());
-        return activeBookRepository.save(activeBook);
+    public ActiveBook updateActiveBook(ActiveBook activeBookFromDb, ActiveBook activeBook) {
+//        Optional<ActiveBook> optionalActiveBook = activeBookRepository.findById(id);
+//        if (optionalActiveBook.isEmpty())
+//            throw new ActiveBookNotFoundException("There are no active book with id " + id);
+//        activeBook.setId(id);
+//        activeBook.setSubscriptionStatus(SubscriptionStatus.WAITING);
+//        activeBook.setStartDate(new Date());
+
+        //хз просто як то обновляти activeBook
+        activeBookFromDb.setFine(activeBook.getFine());
+        activeBookFromDb.setEndDate(activeBook.getEndDate());
+        activeBookFromDb.setSubscriptionStatus(activeBook.getSubscriptionStatus());
+        return activeBookRepository.save(activeBookFromDb);
     }
 
     @Transactional
-    public ActiveBook returnActiveBook(int activeBookId) {
-        Optional<ActiveBook> optionalActiveBook = activeBookRepository.findById(activeBookId);
-        if (optionalActiveBook.isEmpty())
-            throw new ActiveBookNotFoundException("There are not active book with id " + activeBookId);
+    public ActiveBook returnActiveBook(ActiveBook activeBook) {
+//        Optional<ActiveBook> optionalActiveBook = activeBookRepository.findById(activeBookId);
+//        if (optionalActiveBook.isEmpty())
+//            throw new ActiveBookNotFoundException("There are not active book with id " + activeBookId);
+//        ActiveBook activeBook = optionalActiveBook.get();
 
-        ActiveBook activeBook = optionalActiveBook.get();
         String isbn = activeBook.getBook().getIsbn();
         Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
         if (optionalBook.isEmpty())
@@ -94,13 +103,14 @@ public class ActiveBookService {
 
         Book book = optionalBook.get();
         book.setQuantity(book.getQuantity() + 1);
-        bookService.updateBook(book.getIsbn(), book);
-
-
-        activeBookRepository.updateSubscriptionStatus(activeBookId);
+        bookService.updateBook(book, book);
 
         activeBook.setSubscriptionStatus(SubscriptionStatus.RETURNED);
-        return activeBook;
+        return activeBookRepository.save(activeBook);
+//        activeBookRepository.updateSubscriptionStatus(activeBook.getId(),SubscriptionStatus.RETURNED);
+////перевірити, чи можна так, адже я вже отримую через PathVariable
+////        activeBook.setSubscriptionStatus(SubscriptionStatus.RETURNED);
+//        return activeBook;
     }
 
 
@@ -117,9 +127,13 @@ public class ActiveBookService {
 
         Book book = optionalBook.get();
         book.setQuantity(book.getQuantity() + 1);
-        bookService.updateBook(book.getIsbn(), book);
+        bookService.updateBook(book, book);
 
         activeBookRepository.deleteById(id);
         return activeBook;
+    }
+
+    public void delete(ActiveBook activeBook) {
+        activeBookRepository.delete(activeBook);
     }
 }

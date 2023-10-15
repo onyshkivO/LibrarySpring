@@ -1,77 +1,86 @@
 package com.onyshkiv.libraryspring.controller;
 
-import com.onyshkiv.libraryspring.DTO.PublicationDTO;
+
+import com.fasterxml.jackson.annotation.JsonView;
 import com.onyshkiv.libraryspring.entity.Publication;
-import com.onyshkiv.libraryspring.exception.publication.PublicationNotFoundException;
+import com.onyshkiv.libraryspring.entity.Views;
 import com.onyshkiv.libraryspring.exception.publication.PublicationNotSavedException;
 import com.onyshkiv.libraryspring.service.PublicationService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/publications")
 public class PublicationController {
     private final PublicationService publicationService;
-    private final ModelMapper modelMapper;
 
     @Autowired
     public PublicationController(PublicationService publicationService, ModelMapper modelMapper) {
         this.publicationService = publicationService;
-        this.modelMapper = modelMapper;
     }
-
+//todo можливо тут краще повертати не page а list або зробити клас де будне лист, пейджа і курент пейджа як в сарафані робили
     @GetMapping()
-    public ResponseEntity<List<PublicationDTO>> getAllPublications() {
-        List<PublicationDTO> publications = publicationService.getAllPublications()
-                .stream()
-                .map(this::convertToPublicationDTO)
-                .toList();
+    @JsonView(Views.IdName.class)
+    public ResponseEntity<Page<Publication>> getAllPublications(@PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<Publication> publications = publicationService.getAllPublications(pageable);
         return new ResponseEntity<>(publications, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PublicationDTO> getPublicationById(@PathVariable("id") int id) {
-        Optional<Publication> optionalPublication = publicationService.getPublicationById(id);
-        if (optionalPublication.isEmpty())
-            throw new PublicationNotFoundException("Not publication found with id " + id);
-        return new ResponseEntity<>(convertToPublicationDTO(optionalPublication.get()), HttpStatus.OK);
+    @JsonView(Views.Full.class)
+    public ResponseEntity<Publication> getPublicationById(@PathVariable("id") Publication publication) {
+//        Optional<Publication> optionalPublication = publicationService.getPublicationById(id);
+//        if (optionalPublication.isEmpty())
+//            throw new PublicationNotFoundException("Not publication found with id " + id);
+
+
+//        if (publication==null) //хз
+
+        return new ResponseEntity<>(publication, HttpStatus.OK);
     }
 
     @PostMapping()
-    public ResponseEntity<PublicationDTO> createPublication(@RequestBody @Valid PublicationDTO publicationDTO,
+    @JsonView(Views.IdName.class)
+    public ResponseEntity<Publication> createPublication(@RequestBody @Valid Publication publication,
+                                                            BindingResult bindingResult) {
+        if (bindingResult.hasErrors())
+            throw new PublicationNotSavedException(bindingResult.getFieldErrors() + " bad name ");//todo як правильно тотримувати текст з binding result
+        Publication savedPublication = publicationService.savePublication(publication);
+
+        return new ResponseEntity<>(savedPublication, HttpStatus.OK);
+    }
+
+    @PutMapping("/{id}")
+    @JsonView(Views.Full.class)
+    public ResponseEntity<Publication> updatePublication(@PathVariable("id") Publication publicationFromDb, @RequestBody @Valid Publication publication,
                                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new PublicationNotSavedException(bindingResult.getFieldErrors() + " bad name ");
-        Publication publication = publicationService.savePublication(convertToPublication(publicationDTO));
-        return new ResponseEntity<>(convertToPublicationDTO(publication), HttpStatus.OK);
+
+        Publication savedPublication = publicationService.updatePublication(publicationFromDb, publication);
+
+        return new ResponseEntity<>(savedPublication, HttpStatus.OK);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<PublicationDTO> updatePublication(@PathVariable("id") int id, @RequestBody @Valid PublicationDTO publicationDTO,
-                                                            BindingResult bindingResult) {
-        if (bindingResult.hasErrors())
-            throw new PublicationNotSavedException(bindingResult.getFieldErrors() + " bad name ");
-
-        Publication publication = publicationService.updatePublication(id, convertToPublication(publicationDTO));
-        return new ResponseEntity<>(convertToPublicationDTO(publication), HttpStatus.OK);
+    @DeleteMapping("/{id}")
+    @JsonView(Views.IdName.class)
+    public ResponseEntity<Publication> deletePublication(@PathVariable("id") Publication publication){
+        publicationService.delete(publication);
+        return new ResponseEntity<>(publication,HttpStatus.OK);
     }
 
 
-    private PublicationDTO convertToPublicationDTO(Publication publication) {
-        return modelMapper.map(publication, PublicationDTO.class);
-    }
-
-    private Publication convertToPublication(PublicationDTO publicationDTO) {
-        return modelMapper.map(publicationDTO, Publication.class);
-    }
 
 
 }

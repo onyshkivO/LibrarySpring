@@ -1,98 +1,97 @@
 package com.onyshkiv.libraryspring.controller;
 
 
-import com.onyshkiv.libraryspring.DTO.UserDTO;
+import com.fasterxml.jackson.annotation.JsonView;
 import com.onyshkiv.libraryspring.entity.Role;
 import com.onyshkiv.libraryspring.entity.User;
-import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
+import com.onyshkiv.libraryspring.entity.Views;
 import com.onyshkiv.libraryspring.exception.user.UserNotSavedException;
 import com.onyshkiv.libraryspring.service.UserService;
 import com.onyshkiv.libraryspring.util.UserValidator;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-    private final ModelMapper modelMapper;
     private final UserValidator userValidator;
 
     @Autowired
     public UserController(UserService userService, ModelMapper modelMapper, UserValidator userValidator) {
         this.userService = userService;
-        this.modelMapper = modelMapper;
         this.userValidator = userValidator;
     }
 
     @GetMapping()
-    public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers()
-                .stream()
-                .map(this::convertToUserDTO)
-                .toList();
+    @JsonView(Views.IdName.class)
+    public ResponseEntity<Page<User>> getAllUsers(@PageableDefault(sort = {"login"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<User> users = userService.getAllUsers(pageable);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @GetMapping("/{login}")
-    public ResponseEntity<UserDTO> getUserByLogin(@PathVariable("login") String login) {
-        Optional<User> optionalUser = userService.getUserByLogin(login);
-        if (optionalUser.isEmpty())
-            throw new UserNotFoundException("Not user found with login " + login);//todo можливо це має робитися через aop і ті advice
-        return new ResponseEntity<>(convertToUserDTO(optionalUser.get()), HttpStatus.OK);
+    @JsonView(Views.Full.class)
+    public ResponseEntity<User> getUserByLogin(@PathVariable("login") User user) {
+//        Optional<User> optionalUser = userService.getUserByLogin(login);
+//        if (optionalUser.isEmpty())
+//            throw new UserNotFoundException("Not user found with login " + login);//todo можливо це має робитися через aop і ті advice
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PostMapping()
-    public ResponseEntity<UserDTO> saveUser(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
-        userValidator.validate(userDTO, bindingResult);
+    @JsonView(Views.IdName.class)
+    public ResponseEntity<User> saveUser(@RequestBody @Valid User user, BindingResult bindingResult) {
+        userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) throw new UserNotSavedException(bindingResult.getFieldErrors().toString());
-        User user = userService.saveUser(convertAToUser(userDTO), Role.ROLE_READER);
-        return new ResponseEntity<>(convertToUserDTO(user), HttpStatus.OK);
+
+        User savedUser = userService.saveUser(user, Role.ROLE_READER);
+        return new ResponseEntity<>(savedUser, HttpStatus.OK);
     }
 
     @PostMapping("/librarian")
-    public ResponseEntity<UserDTO> createLibrarian(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult) {
-        userValidator.validate(userDTO, bindingResult);
+    @JsonView(Views.IdName.class)
+    public ResponseEntity<User> createLibrarian(@RequestBody @Valid User user, BindingResult bindingResult) {
+        userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) throw new UserNotSavedException(bindingResult.getFieldErrors().toString());
-        User user = userService.saveUser(convertAToUser(userDTO), Role.ROLE_LIBRARIAN);
-        return new ResponseEntity<>(convertToUserDTO(user), HttpStatus.OK);
+
+        User savedUser = userService.saveUser(user, Role.ROLE_LIBRARIAN);
+        return new ResponseEntity<>(savedUser, HttpStatus.OK);
     }
 
 
-    @PatchMapping("/{login}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable("login") String login, @RequestBody @Valid UserDTO userDTO,
-                                              BindingResult bindingResult) {
+    @PutMapping("/{login}")
+    @JsonView(Views.Full.class)
+    public ResponseEntity<User> updateUser(@PathVariable("login") User userFromDb,
+                                           @RequestBody @Valid User user,
+                                           BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new UserNotSavedException(bindingResult.getFieldErrors().toString());
-        User user = userService.updateUser(login, convertAToUser(userDTO));
-        return new ResponseEntity<>(convertToUserDTO(user), HttpStatus.OK);
+        User updatedUser = userService.updateUser(userFromDb, user);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
     @DeleteMapping("/{login}")
-    public ResponseEntity<UserDTO> deleteUserByLogin(@PathVariable("login") String login) {
-        User user = userService.deleteUserByLogin(login);
-        return new ResponseEntity<>(convertToUserDTO(user), HttpStatus.OK);
+    @JsonView(Views.IdName.class)
+    public ResponseEntity<User> deleteUserByLogin(@PathVariable("login") User user) {
+        userService.delete(user);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PatchMapping("/status/{login}")
-    public ResponseEntity<UserDTO> changeUserStatus(@PathVariable("login") String login) {
-        User user = userService.changeUserStatus(login);
-        return new ResponseEntity<>(convertToUserDTO(user), HttpStatus.OK);
+    public ResponseEntity<User> changeUserStatus(@PathVariable("login") User user) {
+        User updatedUser = userService.changeUserStatus(user);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
 
     }
 
-    private UserDTO convertToUserDTO(User user) {
-        return modelMapper.map(user, UserDTO.class);
-    }
-
-    private User convertAToUser(UserDTO userDTO) {
-        return modelMapper.map(userDTO, User.class);
-    }
 }

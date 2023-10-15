@@ -1,6 +1,6 @@
 package com.onyshkiv.libraryspring.util;
 
-import com.onyshkiv.libraryspring.DTO.UserDTO;
+import com.onyshkiv.libraryspring.entity.User;
 import com.onyshkiv.libraryspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,12 +18,12 @@ public class UserValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return UserDTO.class.equals(clazz);
+        return User.class.equals(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        UserDTO user  = (UserDTO) target;
+        User user  = (User) target;
         if (userService.getUserByLogin(user.getLogin()).isPresent()){
             errors.rejectValue("login","","User login already exist");
         }

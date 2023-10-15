@@ -1,15 +1,12 @@
 package com.onyshkiv.libraryspring.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -19,13 +16,15 @@ public class Publication {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "publication_id")
-    private int publicationId;
+    @JsonView(Views.Id.class)
+    private int id;
     @Column(name = "name")
     @NotBlank(message = "Bad publication name")
+    @JsonView(Views.IdName.class)
     private String name;
 
     @OneToMany(mappedBy = "publication")
-    @JsonBackReference("bookPublication")
+    @JsonView(Views.Full.class)
     private List<Book> books;
 
 }

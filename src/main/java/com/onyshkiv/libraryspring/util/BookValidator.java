@@ -1,6 +1,6 @@
 package com.onyshkiv.libraryspring.util;
 
-import com.onyshkiv.libraryspring.DTO.BookDTO;
+import com.onyshkiv.libraryspring.entity.Book;
 import com.onyshkiv.libraryspring.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,12 +18,12 @@ public class BookValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return BookDTO.class.equals(clazz);
+        return Book.class.equals(clazz);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        BookDTO book = (BookDTO) target;
+        Book book = (Book) target;
         if (bookService.getBookByIsbn(book.getIsbn()).isPresent())
             errors.rejectValue("isbn", "", "Book with isbn " + book.getIsbn() + " already exist");
 
