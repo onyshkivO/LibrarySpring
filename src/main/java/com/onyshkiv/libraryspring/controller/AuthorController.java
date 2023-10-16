@@ -47,7 +47,7 @@ public class AuthorController {
     }
 
     @PutMapping("/{id}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullAuthor.class)
     public ResponseEntity<Author> updateAuthor(@PathVariable("id") Author authorFromDb,
                                                @RequestBody() @Valid Author author,
                                                BindingResult bindingResult) {
@@ -66,7 +66,7 @@ public class AuthorController {
     }
 
     @GetMapping("/{id}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullAuthor.class)
     public ResponseEntity<Author> getAuthorById(@PathVariable("id") Author author) {
 //        Optional<Author> optionalAuthor = authorService.getAuthorById(id);
 //        if (optionalAuthor.isEmpty())

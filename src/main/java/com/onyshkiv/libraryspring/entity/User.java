@@ -1,6 +1,8 @@
 package com.onyshkiv.libraryspring.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -16,6 +18,10 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Table(name = "user")
+@JsonIdentityInfo(
+        property = "login",
+        generator = ObjectIdGenerators.PropertyGenerator.class
+)
 public class User{
 
     @Id
@@ -59,11 +65,11 @@ public class User{
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role_id")
+    @Column(name = "role")
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status_id")
+    @Column(name = "status")
     private UserStatus userStatus;
 
     @OneToMany(mappedBy = "user",fetch = FetchType.EAGER)

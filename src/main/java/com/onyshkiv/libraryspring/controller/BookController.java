@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/books")
 public class BookController {
@@ -31,17 +33,24 @@ public class BookController {
         this.bookValidator = bookValidator;
     }
 
-    @GetMapping()
-    @JsonView(Views.Full.class)
-    public ResponseEntity<Page<Book>> getAllBooks(@PageableDefault Pageable pageable) {
-        Page<Book> books = bookService.getAllBooks(pageable);
-        return new ResponseEntity<>(books, HttpStatus.OK);
-    }
+//    @GetMapping()
+//    @JsonView(Views.Full.class)
+//    public ResponseEntity<List<Book>> getAllBooks(@PageableDefault Pageable pageable) {
+//        Page<Book> books = bookService.getAllBooks(pageable);
+//        List<Book> content = books.getContent();
+//        return new ResponseEntity<>(content, HttpStatus.OK);
+//    }
 
+    @GetMapping()
+    @JsonView(Views.FullBook.class)
+    public List<Book> getAllBooks(@PageableDefault Pageable pageable) {
+        Page<Book> books = bookService.getAllBooks(pageable);
+        return books.getContent();
+    }
 
     //todo якщо я просто хотів книжки якогось автора то можна просто метод getBooks викликати відповідного автора чи публікації
     @GetMapping("/author/{id}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullBook.class)
     public ResponseEntity<Page<Book>> getBooksByAuthorId(@PathVariable("id") int id, @PageableDefault Pageable pageable) {
         Page<Book> books = bookService.findBooksByAuthor(id, pageable);
         return new ResponseEntity<>(books, HttpStatus.OK);
@@ -55,14 +64,14 @@ public class BookController {
     }
 
     @GetMapping("/search")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullBook.class)
     public ResponseEntity<Page<Book>> getBooksByName(@RequestParam(value = "name", required = false) String name, @PageableDefault Pageable pageable) {
         Page<Book> books = bookService.findBooksByName(name, pageable);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/{isbn}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullBook.class)
     public ResponseEntity<Book> getBookByIsbn(@PathVariable("isbn") Book book) {
 //        Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
 //        if (optionalBook.isEmpty()) throw new BookNotFoundException("Not book with isbn " + isbn);
@@ -73,7 +82,7 @@ public class BookController {
 
     //todo перевірити що буде, якщо там не задати авторів або/і публікацію
     @PostMapping()
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullBook.class)
     public ResponseEntity<Book> saveBook(@RequestBody @Valid Book book, BindingResult bindingResult) {
         bookValidator.validate(book, bindingResult);
         if (bindingResult.hasErrors()) throw new BookNotSavedException(bindingResult.getFieldErrors().toString());
@@ -84,7 +93,7 @@ public class BookController {
 
     //todo розібратися з тими валідаторами, чи треба їх в update щоб проблем з id не було(типу просто оновлюєш, а воно каже таке id вже є)
     @PutMapping("/{isbn}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullBook.class)
     public ResponseEntity<Book> updateBook(@PathVariable("isbn") Book bookFromDb, @RequestBody @Valid Book book, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new BookNotSavedException(bindingResult.getFieldErrors().toString());

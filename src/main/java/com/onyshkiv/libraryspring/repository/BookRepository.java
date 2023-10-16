@@ -12,14 +12,14 @@ import java.util.List;
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
 
-    @EntityGraph(attributePaths = {"authors","activeBooks"})
+//    @EntityGraph(attributePaths = {"authors","activeBooks"})
     Page<Book> findAll(Pageable pageable);
 
     @EntityGraph(attributePaths = {"authors","activeBooks"})
-    Page<Book> getBooksByAuthorsAuthorId(int id, Pageable pageable);
+    Page<Book> getBooksByAuthorsId(int id, Pageable pageable);
 
     @EntityGraph(attributePaths = {"authors","activeBooks"})
-    Page<Book> getBooksByPublicationPublicationId(int id, Pageable pageable);
+    Page<Book> getBooksByPublicationId(int id, Pageable pageable);
 
     @EntityGraph(attributePaths = {"authors","activeBooks"})
     Page<Book> getBooksByNameStartingWith(String name, Pageable pageable);

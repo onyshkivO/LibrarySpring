@@ -21,7 +21,7 @@ import java.util.List;
 @Entity
 @Table(name = "book")
 @JsonIdentityInfo(
-        property = "id",
+        property = "isbn",
         generator = ObjectIdGenerators.PropertyGenerator.class
 )
 public class Book {
@@ -40,36 +40,35 @@ public class Book {
 
     @Column(name = "date_of_publication")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullBook.class)
     private LocalDate dateOfPublication;
 
     @Column(name = "quantity")
     @NotNull(message = "Bad quantity value")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullBook.class)
     private Integer quantity;
 
 
 
     @Column(name = "details")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullBook.class)
     private String details;
 
     //todo признгачити activeBooks = new ArrayList<>(); щоб не було проблем
     @OneToMany(mappedBy = "book")
-    @JsonView(Views.Full.class)
     private List<ActiveBook> activeBooks;
 
 
     @ManyToOne
-    @JoinColumn(name = "publication_id", referencedColumnName = "publication_id")
-    @JsonView(Views.Full.class)
+    @JoinColumn(name = "publication_id", referencedColumnName = "id")
+    @JsonView(Views.FullBook.class)
     private Publication publication;
 
     @ManyToMany(fetch = FetchType.EAGER,cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "book_has_authors",
             joinColumns = @JoinColumn(name = "b_isbn",referencedColumnName = "isbn"),
-            inverseJoinColumns = @JoinColumn(name = "a_id",referencedColumnName = "authors_id"))
-    @JsonView(Views.Full.class)
+            inverseJoinColumns = @JoinColumn(name = "a_id",referencedColumnName = "id"))
+    @JsonView(Views.FullBook.class)
     private List<Author> authors;
 
 }

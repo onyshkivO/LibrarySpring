@@ -38,7 +38,7 @@ public class PublicationController {
     }
 
     @GetMapping("/{id}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullPublication.class)
     public ResponseEntity<Publication> getPublicationById(@PathVariable("id") Publication publication) {
 //        Optional<Publication> optionalPublication = publicationService.getPublicationById(id);
 //        if (optionalPublication.isEmpty())
@@ -62,7 +62,7 @@ public class PublicationController {
     }
 
     @PutMapping("/{id}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullPublication.class)
     public ResponseEntity<Publication> updatePublication(@PathVariable("id") Publication publicationFromDb, @RequestBody @Valid Publication publication,
                                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors())

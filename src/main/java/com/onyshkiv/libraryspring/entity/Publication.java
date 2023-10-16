@@ -15,7 +15,7 @@ import java.util.List;
 public class Publication {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "publication_id")
+    @Column(name = "id")
     @JsonView(Views.Id.class)
     private int id;
     @Column(name = "name")
@@ -24,7 +24,7 @@ public class Publication {
     private String name;
 
     @OneToMany(mappedBy = "publication")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullPublication.class)
     private List<Book> books;
 
 }

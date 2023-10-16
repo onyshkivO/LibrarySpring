@@ -16,12 +16,12 @@ import java.util.Date;
 public class ActiveBook {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "active_book_id")
+    @Column(name = "id")
     @JsonView(Views.Id.class)
     private int id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "subscription_status_id")
+    @Column(name = "subscription_status")
     @JsonView(Views.Full.class)
     private SubscriptionStatus subscriptionStatus;
 

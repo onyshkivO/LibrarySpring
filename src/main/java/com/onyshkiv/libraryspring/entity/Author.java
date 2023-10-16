@@ -11,11 +11,11 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "authors")
+@Table(name = "author")
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "authors_id")
+    @Column(name = "id")
     @JsonView(Views.Id.class)
     private int id;
 
@@ -26,9 +26,9 @@ public class Author {
 
     @ManyToMany
     @JoinTable(name = "book_has_authors",
-            joinColumns = @JoinColumn(name = "a_id", referencedColumnName = "authors_id"),
+            joinColumns = @JoinColumn(name = "a_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "b_isbn", referencedColumnName = "isbn"))
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullAuthor.class)
     private List<Book> books;
 
 }

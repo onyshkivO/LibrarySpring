@@ -75,7 +75,7 @@ public class BookService {
 //        Optional<Author> optionalAuthor = authorRepository.findById(id);
 //        if (optionalAuthor.isEmpty()) throw new AuthorNotFoundException("There are not author with id " + id);
 
-        return bookRepository.getBooksByAuthorsAuthorId(id,pageable);
+        return bookRepository.getBooksByAuthorsId(id,pageable);
     }
 
     public Page<Book> findBooksByPublication(int id,Pageable pageable) {
@@ -83,7 +83,7 @@ public class BookService {
 //        if (optionalPublication.isEmpty())
 //            throw new PublicationNotFoundException("There are not publication with id " + id);
 
-        return bookRepository.getBooksByPublicationPublicationId(id,pageable);
+        return bookRepository.getBooksByPublicationId(id,pageable);
     }
 
     public Page<Book> findBooksByName(String name, Pageable pageable) {
