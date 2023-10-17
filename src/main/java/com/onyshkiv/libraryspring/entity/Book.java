@@ -14,6 +14,7 @@ import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -54,10 +55,8 @@ public class Book {
     @JsonView(Views.FullBook.class)
     private String details;
 
-    //todo признгачити activeBooks = new ArrayList<>(); щоб не було проблем
     @OneToMany(mappedBy = "book")
     private List<ActiveBook> activeBooks;
-
 
     @ManyToOne
     @JoinColumn(name = "publication_id", referencedColumnName = "id")
@@ -69,6 +68,6 @@ public class Book {
             joinColumns = @JoinColumn(name = "b_isbn",referencedColumnName = "isbn"),
             inverseJoinColumns = @JoinColumn(name = "a_id",referencedColumnName = "id"))
     @JsonView(Views.FullBook.class)
-    private List<Author> authors;
+    private Set<Author> authors;
 
 }

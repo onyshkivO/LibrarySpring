@@ -32,7 +32,7 @@ public class ActiveBookController {
     }
 
     @GetMapping()
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullActiveBook.class)
     public ResponseEntity<DataPageDto<ActiveBook>> getAllActiveBooks(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         DataPageDto<ActiveBook> activeBooks = activeBookService.getAllActiveBooks(pageable);
@@ -40,7 +40,7 @@ public class ActiveBookController {
     }
 
     @GetMapping("/{id}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullActiveBook.class)
     public ResponseEntity<ActiveBook> getActiveBookById(@PathVariable("id") ActiveBook activeBook) {
 //        Optional<ActiveBook> optionalActiveBook = activeBookService.getActiveBookById(id);
 //        if (optionalActiveBook.isEmpty())
@@ -50,7 +50,7 @@ public class ActiveBookController {
     }
 
     @GetMapping("/user/{login}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullActiveBook.class)
     public ResponseEntity<Page<ActiveBook>> getActiveBooksByUserLogin(
             @PathVariable("login") String login,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -70,7 +70,7 @@ public class ActiveBookController {
     }
 
     @PutMapping("/{id}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullActiveBook.class)
     public ResponseEntity<ActiveBook> updateActiveBook(@PathVariable("id") ActiveBook activeBookFromDb,
                                                        @RequestBody @Valid ActiveBook activeBook,
                                                        BindingResult bindingResult) {
@@ -82,7 +82,7 @@ public class ActiveBookController {
     }
 
     @PatchMapping("/return/{id}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullActiveBook.class)
     public ResponseEntity<ActiveBook> returnActiveBook(@PathVariable("id") ActiveBook activeBook) {
         ActiveBook updatedActiveBook = activeBookService.returnActiveBook(activeBook);
         return new ResponseEntity<>(updatedActiveBook, HttpStatus.OK);

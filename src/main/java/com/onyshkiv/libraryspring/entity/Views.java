@@ -7,6 +7,7 @@ public final class Views {
     public interface FullBook extends IdName{};
     public interface FullAuthor extends IdName{};
     public interface FullPublication extends IdName{};
+    public interface FullActiveBook extends IdName{};
 
 
 }

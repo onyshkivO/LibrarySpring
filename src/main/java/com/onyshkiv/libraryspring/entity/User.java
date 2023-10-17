@@ -72,7 +72,7 @@ public class User{
     @Column(name = "status")
     private UserStatus userStatus;
 
-    @OneToMany(mappedBy = "user",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
     @JsonView(Views.Full.class)
     private List<ActiveBook> activeBooks;
 

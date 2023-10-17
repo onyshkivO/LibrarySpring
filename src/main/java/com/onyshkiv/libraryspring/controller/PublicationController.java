@@ -25,7 +25,7 @@ public class PublicationController {
     private final PublicationService publicationService;
 
     @Autowired
-    public PublicationController(PublicationService publicationService, ModelMapper modelMapper) {
+    public PublicationController(PublicationService publicationService) {
         this.publicationService = publicationService;
     }
 

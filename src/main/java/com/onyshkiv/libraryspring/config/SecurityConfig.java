@@ -30,20 +30,20 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers(HttpMethod.GET,"/books").hasAnyRole("ADMINISTRATOR", "USER", "LIBRARIAN")
-                        .requestMatchers(HttpMethod.PATCH, "/activeBooks/return/{id}", "/activeBooks/{id}"
+                        .requestMatchers(HttpMethod.GET, "/books").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/activeBooks/return/{id}", "/activeBooks/{id}"
                                 , "/authors/{id}", "/books/{isbn}", "/publications/{id}", "/users/{login}", "/users/status/{login}").hasAnyRole("LIBRARIAN", "ADMINISTRATOR")
-                        .requestMatchers(HttpMethod.PATCH, "/users/status/{login}").hasRole("ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.PUT, "/users/status/{login}").hasRole("ADMINISTRATOR")
                         .requestMatchers(HttpMethod.POST, "/authors", "/books", "/publications", "/users/librarian").hasRole("ADMINISTRATOR")
                         .requestMatchers(HttpMethod.DELETE, "/activeBooks/{id}").hasRole("LIBRARIAN")
                         .requestMatchers(HttpMethod.DELETE, "/activeBooks/{id}", "/authors/{id}", "/publications/{id}", "/users/{login}", "/books/{isbn}").hasRole("ADMINISTRATOR")
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                        //.anyRequest().hasAnyRole("ADMINISTRATOR", "USER", "LIBRARIAN")
+//                        .anyRequest().hasAnyRole("ADMINISTRATOR", "USER", "LIBRARIAN")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
                 .httpBasic(Customizer.withDefaults())
-                .formLogin(AbstractHttpConfigurer::disable)
+//                .formLogin(AbstractHttpConfigurer::disable)
                 .build();
     }
 
