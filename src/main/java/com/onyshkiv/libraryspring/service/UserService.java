@@ -1,5 +1,6 @@
 package com.onyshkiv.libraryspring.service;
 
+import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.*;
 import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
 import com.onyshkiv.libraryspring.exception.user.UserNotSavedException;
@@ -31,8 +32,9 @@ public class UserService {
         return userRepository.findById(login);
     }
 
-    public Page<User> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable);
+    public DataPageDto<User> getAllUsers(Pageable pageable) {
+        Page<User> usersPage = userRepository.findAll(pageable);
+        return new DataPageDto<>(usersPage.getContent(),pageable.getPageNumber(),usersPage.getTotalPages());
     }
 
     @Transactional

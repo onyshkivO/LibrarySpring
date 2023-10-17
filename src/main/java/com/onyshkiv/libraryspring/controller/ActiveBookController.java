@@ -2,6 +2,7 @@ package com.onyshkiv.libraryspring.controller;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.ActiveBook;
 import com.onyshkiv.libraryspring.entity.Views;
 import com.onyshkiv.libraryspring.exception.activeBook.ActiveBookNotSavedException;
@@ -32,9 +33,9 @@ public class ActiveBookController {
 
     @GetMapping()
     @JsonView(Views.Full.class)
-    public ResponseEntity<Page<ActiveBook>> getAllActiveBooks(
+    public ResponseEntity<DataPageDto<ActiveBook>> getAllActiveBooks(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ActiveBook> activeBooks = activeBookService.getAllActiveBooks(pageable);
+        DataPageDto<ActiveBook> activeBooks = activeBookService.getAllActiveBooks(pageable);
         return new ResponseEntity<>(activeBooks, HttpStatus.OK);
     }
 
@@ -89,10 +90,8 @@ public class ActiveBookController {
 
     @DeleteMapping("/{id}")
     @JsonView(Views.IdName.class)
-    public ResponseEntity<ActiveBook> deleteActiveBookById(@PathVariable("id") ActiveBook activeBook) {
+    public void deleteActiveBookById(@PathVariable("id") ActiveBook activeBook) {
         activeBookService.delete(activeBook);
-        return new ResponseEntity<>(activeBook, HttpStatus.OK);
-
     }
 
 

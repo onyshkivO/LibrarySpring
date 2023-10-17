@@ -2,6 +2,7 @@ package com.onyshkiv.libraryspring.controller;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.Role;
 import com.onyshkiv.libraryspring.entity.User;
 import com.onyshkiv.libraryspring.entity.Views;
@@ -34,8 +35,8 @@ public class UserController {
 
     @GetMapping()
     @JsonView(Views.IdName.class)
-    public ResponseEntity<Page<User>> getAllUsers(@PageableDefault(sort = {"login"}, direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<User> users = userService.getAllUsers(pageable);
+    public ResponseEntity<DataPageDto<User>> getAllUsers(@PageableDefault(sort = {"login"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        DataPageDto<User> users = userService.getAllUsers(pageable);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
@@ -82,9 +83,8 @@ public class UserController {
 
     @DeleteMapping("/{login}")
     @JsonView(Views.IdName.class)
-    public ResponseEntity<User> deleteUserByLogin(@PathVariable("login") User user) {
+    public void deleteUserByLogin(@PathVariable("login") User user) {
         userService.delete(user);
-        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @PatchMapping("/status/{login}")

@@ -1,5 +1,6 @@
 package com.onyshkiv.libraryspring.service;
 
+import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.ActiveBook;
 import com.onyshkiv.libraryspring.entity.Book;
 import com.onyshkiv.libraryspring.entity.SubscriptionStatus;
@@ -38,8 +39,9 @@ public class ActiveBookService {
         this.bookService = bookService;
     }
 
-    public Page<ActiveBook> getAllActiveBooks(Pageable pageable) {
-        return activeBookRepository.findAll(pageable);
+    public DataPageDto<ActiveBook> getAllActiveBooks(Pageable pageable) {
+        Page<ActiveBook> activeBooksPage = activeBookRepository.findAll(pageable);
+        return new DataPageDto<>(activeBooksPage.getContent(), pageable.getPageNumber(), activeBooksPage.getTotalPages());
     }
 
     public Optional<ActiveBook> getActiveBookById(int id) {

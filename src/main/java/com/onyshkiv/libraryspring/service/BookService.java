@@ -1,5 +1,6 @@
 package com.onyshkiv.libraryspring.service;
 
+import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.Book;
 import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.repository.AuthorRepository;
@@ -29,8 +30,9 @@ public class BookService {
     }
 
 
-    public Page<Book> getAllBooks(Pageable pageable) {
-        return bookRepository.findAll(pageable);
+    public DataPageDto<Book> getAllBooks(Pageable pageable) {
+        Page<Book> booksPage = bookRepository.findAll(pageable);
+        return new DataPageDto<>(booksPage.getContent(),pageable.getPageNumber(),booksPage.getTotalPages());
     }
 
     public Optional<Book> getBookByIsbn(String isbn) {
@@ -70,20 +72,20 @@ public class BookService {
     }
 
 
-    public Page<Book> findBooksByAuthor(int id,Pageable pageable) {
+    public DataPageDto<Book> findBooksByAuthor(int id,Pageable pageable) {
         //думаю не треба, бо як не буде такого автора то просто пустий список книжок
 //        Optional<Author> optionalAuthor = authorRepository.findById(id);
 //        if (optionalAuthor.isEmpty()) throw new AuthorNotFoundException("There are not author with id " + id);
-
-        return bookRepository.getBooksByAuthorsId(id,pageable);
+        Page<Book> booksPage = bookRepository.getBooksByAuthorsId(id, pageable);
+        return new DataPageDto<>(booksPage.getContent(),pageable.getPageNumber(),booksPage.getTotalPages());
     }
 
-    public Page<Book> findBooksByPublication(int id,Pageable pageable) {
+    public DataPageDto<Book> findBooksByPublication(int id,Pageable pageable) {
 //        Optional<Publication> optionalPublication = publicationRepository.findById(id);
 //        if (optionalPublication.isEmpty())
 //            throw new PublicationNotFoundException("There are not publication with id " + id);
-
-        return bookRepository.getBooksByPublicationId(id,pageable);
+        Page<Book> booksPage = bookRepository.getBooksByPublicationId(id,pageable);
+        return new DataPageDto<>(booksPage.getContent(),pageable.getPageNumber(),booksPage.getTotalPages());
     }
 
     public Page<Book> findBooksByName(String name, Pageable pageable) {

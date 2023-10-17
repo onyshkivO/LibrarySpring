@@ -2,6 +2,7 @@ package com.onyshkiv.libraryspring.controller;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.Book;
 import com.onyshkiv.libraryspring.entity.Views;
 import com.onyshkiv.libraryspring.exception.book.BookNotSavedException;
@@ -43,23 +44,23 @@ public class BookController {
 
     @GetMapping()
     @JsonView(Views.FullBook.class)
-    public List<Book> getAllBooks(@PageableDefault Pageable pageable) {
-        Page<Book> books = bookService.getAllBooks(pageable);
-        return books.getContent();
+    public ResponseEntity<DataPageDto<Book>> getAllBooks(@PageableDefault Pageable pageable) {
+        DataPageDto<Book> books = bookService.getAllBooks(pageable);
+        return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     //todo якщо я просто хотів книжки якогось автора то можна просто метод getBooks викликати відповідного автора чи публікації
     @GetMapping("/author/{id}")
     @JsonView(Views.FullBook.class)
-    public ResponseEntity<Page<Book>> getBooksByAuthorId(@PathVariable("id") int id, @PageableDefault Pageable pageable) {
-        Page<Book> books = bookService.findBooksByAuthor(id, pageable);
+    public ResponseEntity<DataPageDto<Book>> getBooksByAuthorId(@PathVariable("id") int id, @PageableDefault Pageable pageable) {
+        DataPageDto<Book> books = bookService.findBooksByAuthor(id, pageable);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/publication/{id}")
     @JsonView(Views.IdName.class)
-    public ResponseEntity<Page<Book>> getBooksByPublicationId(@PathVariable("id") int id, @PageableDefault Pageable pageable) {
-        Page<Book> books = bookService.findBooksByPublication(id, pageable);
+    public ResponseEntity<DataPageDto<Book>> getBooksByPublicationId(@PathVariable("id") int id, @PageableDefault Pageable pageable) {
+        DataPageDto<Book> books = bookService.findBooksByPublication(id, pageable);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
@@ -104,9 +105,8 @@ public class BookController {
 
     @DeleteMapping("/{isbn}")
     @JsonView(Views.IdName.class)
-    public ResponseEntity<Book> deleteBookByIsbn(@PathVariable("isbn") Book book) {
+    public void deleteBookByIsbn(@PathVariable("isbn") Book book) {
         bookService.delete(book);
-        return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
 

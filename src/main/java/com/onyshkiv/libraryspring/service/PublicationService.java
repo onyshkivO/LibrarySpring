@@ -1,5 +1,6 @@
 package com.onyshkiv.libraryspring.service;
 
+import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.Publication;
 import com.onyshkiv.libraryspring.exception.publication.PublicationNotFoundException;
 import com.onyshkiv.libraryspring.exception.publication.PublicationNotSavedException;
@@ -23,8 +24,9 @@ public class PublicationService {
         this.publicationRepository = publicationRepository;
     }
 
-    public Page<Publication> getAllPublications(Pageable pageable) {
-        return publicationRepository.findAll(pageable);
+    public DataPageDto<Publication> getAllPublications(Pageable pageable) {
+        Page<Publication> publicationsPage = publicationRepository.findAll(pageable);
+        return new DataPageDto<>(publicationsPage.getContent(),pageable.getPageNumber(),publicationsPage.getTotalPages());
     }
 
     public Optional<Publication> getPublicationById(int id) {

@@ -2,6 +2,7 @@ package com.onyshkiv.libraryspring.controller;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.Author;
 import com.onyshkiv.libraryspring.entity.Views;
 import com.onyshkiv.libraryspring.exception.author.AuthorNotFoundException;
@@ -60,8 +61,8 @@ public class AuthorController {
 
     @GetMapping()
     @JsonView(Views.IdName.class)
-    public ResponseEntity<Page<Author>> getAllActiveBooks(@PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<Author> authors = authorService.getAllAuthors(pageable);
+    public ResponseEntity<DataPageDto<Author>> getAllActiveBooks(@PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        DataPageDto<Author> authors = authorService.getAllAuthors(pageable);
         return new ResponseEntity<>(authors, HttpStatus.OK);
     }
 
@@ -74,12 +75,10 @@ public class AuthorController {
 
         return new ResponseEntity<>(author, HttpStatus.OK);
     }
-//todo передивитися і може забрати на void і всюди позабирати ResponseEntity як у sarafan
     @DeleteMapping("/{id}")
     @JsonView(Views.IdName.class)
-    public ResponseEntity<Author> deleteAuthorById(@PathVariable("id") Author author) {
+    public void deleteAuthorById(@PathVariable("id") Author author) {
         authorService.delete(author);
-        return new ResponseEntity<>(author, HttpStatus.OK);
     }
 
 

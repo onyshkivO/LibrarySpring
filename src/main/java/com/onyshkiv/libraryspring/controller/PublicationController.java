@@ -2,6 +2,7 @@ package com.onyshkiv.libraryspring.controller;
 
 
 import com.fasterxml.jackson.annotation.JsonView;
+import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.Publication;
 import com.onyshkiv.libraryspring.entity.Views;
 import com.onyshkiv.libraryspring.exception.publication.PublicationNotSavedException;
@@ -9,7 +10,6 @@ import com.onyshkiv.libraryspring.service.PublicationService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/publications")
@@ -29,11 +28,11 @@ public class PublicationController {
     public PublicationController(PublicationService publicationService, ModelMapper modelMapper) {
         this.publicationService = publicationService;
     }
-//todo можливо тут краще повертати не page а list або зробити клас де будне лист, пейджа і курент пейджа як в сарафані робили
+
     @GetMapping()
-    @JsonView(Views.IdName.class)
-    public ResponseEntity<Page<Publication>> getAllPublications(@PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<Publication> publications = publicationService.getAllPublications(pageable);
+    @JsonView(Views.FullPublication.class)
+    public ResponseEntity<DataPageDto<Publication>> getAllPublications(@PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        DataPageDto<Publication> publications = publicationService.getAllPublications(pageable);
         return new ResponseEntity<>(publications, HttpStatus.OK);
     }
 
@@ -53,7 +52,7 @@ public class PublicationController {
     @PostMapping()
     @JsonView(Views.IdName.class)
     public ResponseEntity<Publication> createPublication(@RequestBody @Valid Publication publication,
-                                                            BindingResult bindingResult) {
+                                                         BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new PublicationNotSavedException(bindingResult.getFieldErrors() + " bad name ");//todo як правильно тотримувати текст з binding result
         Publication savedPublication = publicationService.savePublication(publication);
@@ -64,7 +63,7 @@ public class PublicationController {
     @PutMapping("/{id}")
     @JsonView(Views.FullPublication.class)
     public ResponseEntity<Publication> updatePublication(@PathVariable("id") Publication publicationFromDb, @RequestBody @Valid Publication publication,
-                                                            BindingResult bindingResult) {
+                                                         BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new PublicationNotSavedException(bindingResult.getFieldErrors() + " bad name ");
 
@@ -75,12 +74,9 @@ public class PublicationController {
 
     @DeleteMapping("/{id}")
     @JsonView(Views.IdName.class)
-    public ResponseEntity<Publication> deletePublication(@PathVariable("id") Publication publication){
+    public void deletePublication(@PathVariable("id") Publication publication) {
         publicationService.delete(publication);
-        return new ResponseEntity<>(publication,HttpStatus.OK);
     }
-
-
 
 
 }

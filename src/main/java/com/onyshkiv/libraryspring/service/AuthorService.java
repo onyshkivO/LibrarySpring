@@ -1,5 +1,6 @@
 package com.onyshkiv.libraryspring.service;
 
+import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.Author;
 import com.onyshkiv.libraryspring.exception.author.AuthorNotFoundException;
 import com.onyshkiv.libraryspring.exception.author.AuthorNotSavedException;
@@ -23,8 +24,10 @@ public class AuthorService {
         this.authorRepository = authorRepository;
     }
 
-    public Page<Author> getAllAuthors(Pageable pageable) {
-        return authorRepository.findAll(pageable);
+    public DataPageDto<Author> getAllAuthors(Pageable pageable) {
+        Page<Author> authorsPage = authorRepository.findAll(pageable);
+        return new DataPageDto<>(authorsPage.getContent(),pageable.getPageNumber(),authorsPage.getTotalPages());
+
     }
 
 
