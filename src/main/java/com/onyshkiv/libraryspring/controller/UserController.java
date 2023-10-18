@@ -34,14 +34,14 @@ public class UserController {
     }
 
     @GetMapping()
-    @JsonView(Views.IdName.class)
+    @JsonView(Views.FullUser.class)
     public ResponseEntity<DataPageDto<User>> getAllUsers(@PageableDefault(sort = {"login"}, direction = Sort.Direction.DESC) Pageable pageable) {
         DataPageDto<User> users = userService.getAllUsers(pageable);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @GetMapping("/{login}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullUser.class)
     public ResponseEntity<User> getUserByLogin(@PathVariable("login") User user) {
 //        Optional<User> optionalUser = userService.getUserByLogin(login);
 //        if (optionalUser.isEmpty())
@@ -72,7 +72,7 @@ public class UserController {
 
 
     @PutMapping("/{login}")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.FullUser.class)
     public ResponseEntity<User> updateUser(@PathVariable("login") User userFromDb,
                                            @RequestBody @Valid User user,
                                            BindingResult bindingResult) {

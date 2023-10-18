@@ -9,14 +9,18 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-import java.util.List;
+import java.util.Set;
 
 
 @Entity
 @Data
 @NoArgsConstructor
+@ToString(of={"login","email"})
+@EqualsAndHashCode(of={"login"})
 @Table(name = "user")
 @JsonIdentityInfo(
         property = "login",
@@ -42,26 +46,25 @@ public class User{
     @Column(name = "password")
     @NotBlank(message = "Bad password1")
     @NotNull(message = "Bad password2")
-    //@Pattern(regexp = "^[A-Za-z0-9_-]{6,18}$", message = "Bad password3")
-    //todo пароль щоб не було видно при отриманні користувача
+    @Pattern(regexp = "^[A-Za-z0-9_-]{6,18}$", message = "Bad password3")
     private String password;
 
     @Column(name = "first_name")
     @NotBlank(message = "Bad First Name")
     @Pattern(regexp = "^[a-zA-Zа-яА-Я\\\\s]{2,20}$", message = "Bad First Name")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.IdName.class)
     private String firstName;
 
     @Column(name = "last_name")
     @NotBlank(message = "Bad Last Name")
     @Pattern(regexp = "^[a-zA-Zа-яА-Я\\\\s]{2,20}$", message = "Bad Last Name")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.IdName.class)
     private String lastName;
 
     @Column(name = "phone")
     @Pattern(regexp = "(?:\\+38)?(?:\\(0[0-9]{2}\\)[ .-]?[0-9]{3}[ .-]?[0-9]{2}[ .-]?[0-9]{2}|0[0-9]{2}[ .-]?[0-9]{3}[ .-]?[0-9]{2}[ .-]?[0-9]{2}|0[0-9]{2}[0-9]{7})$",
             message = "Bad phone number")
-    @JsonView(Views.Full.class)
+    @JsonView(Views.IdName.class)
     private String phone;
 
     @Enumerated(EnumType.STRING)
@@ -72,8 +75,8 @@ public class User{
     @Column(name = "status")
     private UserStatus userStatus;
 
-    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY)
-    @JsonView(Views.Full.class)
-    private List<ActiveBook> activeBooks;
+    @OneToMany(mappedBy = "user")
+    @JsonView(Views.FullUser.class)
+    private Set<ActiveBook> activeBooks;
 
 }

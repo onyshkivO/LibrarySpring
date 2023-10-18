@@ -4,13 +4,17 @@ import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @Entity
+@ToString(of={"id","name"})
+@EqualsAndHashCode(of={"id"})
 @Table(name="publication")
 public class Publication {
     @Id
@@ -23,9 +27,9 @@ public class Publication {
     @JsonView(Views.IdName.class)
     private String name;
 
-    @OneToMany(mappedBy = "publication")
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "publication")
     @JsonView(Views.FullPublication.class)
-    private List<Book> books;
+    private Set<Book> books;
 
 }
 

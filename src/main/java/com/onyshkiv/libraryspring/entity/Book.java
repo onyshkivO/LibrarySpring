@@ -9,22 +9,23 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @ToString(of = {"isbn","name"})
+@EqualsAndHashCode(of = {"isbn"})
 @Entity
 @Table(name = "book")
-@JsonIdentityInfo(
-        property = "isbn",
-        generator = ObjectIdGenerators.PropertyGenerator.class
-)
+//@JsonIdentityInfo(
+//        property = "isbn",
+//        generator = ObjectIdGenerators.PropertyGenerator.class
+//)
 public class Book {
     @Id
     @Column(name = "isbn")
@@ -56,7 +57,8 @@ public class Book {
     private String details;
 
     @OneToMany(mappedBy = "book")
-    private List<ActiveBook> activeBooks;
+    @JsonView(Views.Full.class)
+    private Set<ActiveBook> activeBooks;
 
     @ManyToOne
     @JoinColumn(name = "publication_id", referencedColumnName = "id")

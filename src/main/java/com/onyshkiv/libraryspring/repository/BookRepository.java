@@ -5,10 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
+
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, String> {
@@ -16,13 +16,16 @@ public interface BookRepository extends JpaRepository<Book, String> {
     @EntityGraph(attributePaths = {"authors","publication"})
     Page<Book> findAll(Pageable pageable);
 
-    @EntityGraph(attributePaths = {"authors","activeBooks"})
+    @EntityGraph(attributePaths = {"authors","publication"})
+    Optional<Book> findById(String id);
+
+    @EntityGraph(attributePaths = {"authors","publication"})
     Page<Book> getBooksByAuthorsId(int id, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"authors","activeBooks"})
+    @EntityGraph(attributePaths = {"authors","publication"})
     Page<Book> getBooksByPublicationId(int id, Pageable pageable);
 
-    @EntityGraph(attributePaths = {"authors","activeBooks"})
+    @EntityGraph(attributePaths = {"authors","publication"})
     Page<Book> getBooksByNameStartingWith(String name, Pageable pageable);
 
 }

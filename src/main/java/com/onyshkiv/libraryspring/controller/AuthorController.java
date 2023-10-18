@@ -60,8 +60,8 @@ public class AuthorController {
     }
 
     @GetMapping()
-    @JsonView(Views.IdName.class)
-    public ResponseEntity<DataPageDto<Author>> getAllActiveBooks(@PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
+    @JsonView(Views.FullAuthor.class)
+    public ResponseEntity<DataPageDto<Author>> getAuthors(@PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
         DataPageDto<Author> authors = authorService.getAllAuthors(pageable);
         return new ResponseEntity<>(authors, HttpStatus.OK);
     }

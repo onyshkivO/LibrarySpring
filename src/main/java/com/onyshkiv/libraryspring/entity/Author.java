@@ -4,11 +4,16 @@ import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
+import java.util.Set;
 
 @Data
+@ToString(of={"id","name"})
+@EqualsAndHashCode(of={"id"})
 @NoArgsConstructor
 @Entity
 @Table(name = "author")
