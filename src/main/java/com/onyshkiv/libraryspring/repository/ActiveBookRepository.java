@@ -18,7 +18,9 @@ public interface ActiveBookRepository extends JpaRepository<ActiveBook,Integer> 
     @Query("UPDATE ActiveBook ab SET ab.subscriptionStatus = ?2 WHERE ab.id = ?1")
     int updateSubscriptionStatus(int activeBookId, SubscriptionStatus subscriptionStatus);
 
-    @EntityGraph(attributePaths = {"book","user"})
+//    @EntityGraph(attributePaths = {"book","user"})
+
+    @EntityGraph(attributePaths = {"book","user", "book.authors", "book.publication"})
     Page<ActiveBook> findAll(Pageable pageable);
 
     @EntityGraph(attributePaths = {"book","user"})

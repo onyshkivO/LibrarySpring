@@ -18,6 +18,7 @@ public interface UserRepository extends JpaRepository<User, String> {
             "left join fetch b.publication " +
             "left join fetch b.authors "
     )
+@EntityGraph( type = EntityGraph.EntityGraphType.FETCH,attributePaths = {"activeBooks", "activeBooks.book", "activeBooks.book.authors", "activeBooks.book.publication"})
     Page<User> findAll(Pageable pageable);
 
 
