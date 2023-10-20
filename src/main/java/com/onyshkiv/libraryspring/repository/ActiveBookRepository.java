@@ -23,9 +23,9 @@ public interface ActiveBookRepository extends JpaRepository<ActiveBook,Integer> 
     @EntityGraph(attributePaths = {"book","user", "book.authors", "book.publication"})
     Page<ActiveBook> findAll(Pageable pageable);
 
-    @EntityGraph(attributePaths = {"book","user"})
+    @EntityGraph(attributePaths = {"book","user", "book.authors", "book.publication"})
     Optional<ActiveBook> findById(Integer id);
 
-
+    @EntityGraph(attributePaths = {"book","user", "book.authors", "book.publication"})
     Page<ActiveBook> getActiveBooksByUserLogin(String login, Pageable pageable);
 }

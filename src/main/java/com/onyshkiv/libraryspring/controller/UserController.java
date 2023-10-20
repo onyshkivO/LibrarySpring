@@ -6,6 +6,7 @@ import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.Role;
 import com.onyshkiv.libraryspring.entity.User;
 import com.onyshkiv.libraryspring.entity.Views;
+import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
 import com.onyshkiv.libraryspring.exception.user.UserNotSavedException;
 import com.onyshkiv.libraryspring.service.UserService;
 import com.onyshkiv.libraryspring.util.UserValidator;
@@ -20,6 +21,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -50,6 +53,16 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+//    @GetMapping("/{login}")
+//    @JsonView(Views.FullUser.class)
+//    public ResponseEntity<User> getUserByLogin(@PathVariable("login") String login) {
+//        Optional<User> optionalUser = userService.getUserByLogin(login);
+//        if (optionalUser.isEmpty())
+//            throw new UserNotFoundException("Not user found with login " + login);//todo можливо це має робитися через aop і ті advice
+//
+//
+//        return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
+//    }
     @PostMapping()
     @JsonView(Views.IdName.class)
     public ResponseEntity<User> saveUser(@RequestBody @Valid User user, BindingResult bindingResult) {
