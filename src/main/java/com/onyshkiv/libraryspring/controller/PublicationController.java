@@ -8,7 +8,6 @@ import com.onyshkiv.libraryspring.entity.Views;
 import com.onyshkiv.libraryspring.exception.publication.PublicationNotSavedException;
 import com.onyshkiv.libraryspring.service.PublicationService;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -39,13 +38,6 @@ public class PublicationController {
     @GetMapping("/{id}")
     @JsonView(Views.FullPublication.class)
     public ResponseEntity<Publication> getPublicationById(@PathVariable("id") Publication publication) {
-//        Optional<Publication> optionalPublication = publicationService.getPublicationById(id);
-//        if (optionalPublication.isEmpty())
-//            throw new PublicationNotFoundException("Not publication found with id " + id);
-
-
-//        if (publication==null) //хз
-
         return new ResponseEntity<>(publication, HttpStatus.OK);
     }
 
@@ -62,7 +54,8 @@ public class PublicationController {
 
     @PutMapping("/{id}")
     @JsonView(Views.FullPublication.class)
-    public ResponseEntity<Publication> updatePublication(@PathVariable("id") Publication publicationFromDb, @RequestBody @Valid Publication publication,
+    public ResponseEntity<Publication> updatePublication(@PathVariable("id") Publication publicationFromDb,
+                                                         @RequestBody @Valid Publication publication,
                                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new PublicationNotSavedException(bindingResult.getFieldErrors() + " bad name ");
@@ -73,7 +66,6 @@ public class PublicationController {
     }
 
     @DeleteMapping("/{id}")
-    @JsonView(Views.IdName.class)
     public void deletePublication(@PathVariable("id") Publication publication) {
         publicationService.delete(publication);
     }

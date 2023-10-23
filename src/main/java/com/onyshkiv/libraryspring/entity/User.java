@@ -37,25 +37,25 @@ public class User{
     private String login;
 
 
-    @Column(name = "email")
+    @Column(name = "email",nullable = false)
     @NotBlank(message = "Bad email")
     @Email(message = "Bad email")
     @JsonView(Views.IdName.class)
     private String email;
 
-    @Column(name = "password")
+    @Column(name = "password",nullable = false)
     @NotBlank(message = "Bad password1")
     @NotNull(message = "Bad password2")
     @Pattern(regexp = "^[A-Za-z0-9_-]{6,18}$", message = "Bad password3")
     private String password;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name",nullable = false)
     @NotBlank(message = "Bad First Name")
     @Pattern(regexp = "^[a-zA-Zа-яА-Я\\\\s]{2,20}$", message = "Bad First Name")
     @JsonView(Views.IdName.class)
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name",nullable = false)
     @NotBlank(message = "Bad Last Name")
     @Pattern(regexp = "^[a-zA-Zа-яА-Я\\\\s]{2,20}$", message = "Bad Last Name")
     @JsonView(Views.IdName.class)
@@ -68,11 +68,11 @@ public class User{
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "role")
+    @Column(name = "role",nullable = false)
     private Role role;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
+    @Column(name = "status",nullable = false)
     private UserStatus userStatus;
 
     @OneToMany(mappedBy = "user")

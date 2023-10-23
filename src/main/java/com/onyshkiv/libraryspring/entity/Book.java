@@ -12,8 +12,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -61,15 +64,15 @@ public class Book {
     private Set<ActiveBook> activeBooks;
 
     @ManyToOne
-    @JoinColumn(name = "publication_id", referencedColumnName = "id")
+    @JoinColumn(name = "publication_id", referencedColumnName = "id",nullable = false)
     @JsonView(Views.FullBook.class)
     private Publication publication;
 
-    @ManyToMany(fetch = FetchType.EAGER,cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "book_has_authors",
             joinColumns = @JoinColumn(name = "b_isbn",referencedColumnName = "isbn"),
             inverseJoinColumns = @JoinColumn(name = "a_id",referencedColumnName = "id"))
     @JsonView(Views.FullBook.class)
-    private Set<Author> authors;
+    private Set<Author> authors = new HashSet<>();
 
 }

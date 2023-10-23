@@ -25,11 +25,11 @@ public class ActiveBook {
     private int id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "subscription_status")
+    @Column(name = "subscription_status",nullable = false)
     @JsonView(Views.IdName.class)
     private SubscriptionStatus subscriptionStatus;
 
-    @Column(name = "start_date")
+    @Column(name = "start_date",nullable = false)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonView(Views.IdName.class)
     private LocalDate startDate;
@@ -45,12 +45,12 @@ public class ActiveBook {
     private Double fine;
 
     @ManyToOne
-    @JoinColumn(name = "user_login", referencedColumnName = "login")
+    @JoinColumn(name = "user_login", referencedColumnName = "login",nullable = false)
     @JsonView(Views.FullActiveBook.class)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "book_isbn", referencedColumnName = "isbn")
+    @JoinColumn(name = "book_isbn", referencedColumnName = "isbn",nullable = false)
     @JsonView(Views.IdName.class)
     private Book book;
 }

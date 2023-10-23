@@ -22,7 +22,7 @@ public class Publication {
     @Column(name = "id")
     @JsonView(Views.Id.class)
     private int id;
-    @Column(name = "name")
+    @Column(name = "name",nullable = false)
     @NotBlank(message = "Bad publication name")
     @JsonView(Views.IdName.class)
     private String name;

@@ -9,6 +9,8 @@ import com.onyshkiv.libraryspring.exception.book.BookNotSavedException;
 import com.onyshkiv.libraryspring.service.BookService;
 import com.onyshkiv.libraryspring.util.BookValidator;
 import jakarta.validation.Valid;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,14 +36,6 @@ public class BookController {
         this.bookValidator = bookValidator;
     }
 
-//    @GetMapping()
-//    @JsonView(Views.Full.class)
-//    public ResponseEntity<List<Book>> getAllBooks(@PageableDefault Pageable pageable) {
-//        Page<Book> books = bookService.getAllBooks(pageable);
-//        List<Book> content = books.getContent();
-//        return new ResponseEntity<>(content, HttpStatus.OK);
-//    }
-
     @GetMapping()
     @JsonView(Views.FullBook.class)
     public ResponseEntity<DataPageDto<Book>> getAllBooks(@PageableDefault Pageable pageable) {
@@ -66,25 +60,23 @@ public class BookController {
 
     @GetMapping("/search")
     @JsonView(Views.FullBook.class)
-    public ResponseEntity<Page<Book>> getBooksByName(@RequestParam(value = "name", required = false) String name, @PageableDefault Pageable pageable) {
-        Page<Book> books = bookService.findBooksByName(name, pageable);
+    public ResponseEntity<DataPageDto<Book>> getBooksByName(@RequestParam(value = "name", required = false) String name, @PageableDefault Pageable pageable) {
+        DataPageDto<Book> books = bookService.findBooksByName(name, pageable);
+        System.out.println(books.getData());
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/{isbn}")
     @JsonView(Views.FullBook.class)
     public ResponseEntity<Book> getBookByIsbn(@PathVariable("isbn") Book book) {
-//        Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
-//        if (optionalBook.isEmpty()) throw new BookNotFoundException("Not book with isbn " + isbn);
-        //todo може тут якусь перевірку(ну і у всіх контроллерах)
-
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
-    //todo перевірити що буде, якщо там не задати авторів або/і публікацію
+    //todo перевірити що буде, якщо там не задати авторів або/і публікацію(так воно ламається, тому якось то пофіксити)
     @PostMapping()
     @JsonView(Views.FullBook.class)
     public ResponseEntity<Book> saveBook(@RequestBody @Valid Book book, BindingResult bindingResult) {
+        System.out.println(book.getAuthors());
         bookValidator.validate(book, bindingResult);
         if (bindingResult.hasErrors()) throw new BookNotSavedException(bindingResult.getFieldErrors().toString());
         Book savedBook = bookService.saveBook(book);
@@ -93,6 +85,7 @@ public class BookController {
 
 
     //todo розібратися з тими валідаторами, чи треба їх в update щоб проблем з id не було(типу просто оновлюєш, а воно каже таке id вже є)
+    //todo зробити може щоб якось і міняти і авторів і публікації
     @PutMapping("/{isbn}")
     @JsonView(Views.FullBook.class)
     public ResponseEntity<Book> updateBook(@PathVariable("isbn") Book bookFromDb, @RequestBody @Valid Book book, BindingResult bindingResult) {
@@ -104,7 +97,6 @@ public class BookController {
     }
 
     @DeleteMapping("/{isbn}")
-    @JsonView(Views.IdName.class)
     public void deleteBookByIsbn(@PathVariable("isbn") Book book) {
         bookService.delete(book);
     }

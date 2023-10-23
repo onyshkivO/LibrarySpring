@@ -34,6 +34,6 @@ public class Author {
             joinColumns = @JoinColumn(name = "a_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "b_isbn", referencedColumnName = "isbn"))
     @JsonView(Views.FullAuthor.class)
-    private List<Book> books;
+    private Set<Book> books;
 
 }

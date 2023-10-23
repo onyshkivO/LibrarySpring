@@ -32,7 +32,7 @@ public class BookService {
 
     public DataPageDto<Book> getAllBooks(Pageable pageable) {
         Page<Book> booksPage = bookRepository.findAll(pageable);
-        return new DataPageDto<>(booksPage.getContent(),pageable.getPageNumber(),booksPage.getTotalPages());
+        return new DataPageDto<>(booksPage.getContent(), pageable.getPageNumber(), booksPage.getTotalPages());
     }
 
     public Optional<Book> getBookByIsbn(String isbn) {
@@ -42,11 +42,6 @@ public class BookService {
 
     @Transactional
     public Book saveBook(Book book) {
-        //є валідатор тому напевно зайве
-//        Optional<Book> optionalBook = bookRepository.findById(book.getIsbn());
-//        if (optionalBook.isPresent() || book.getIsbn().isBlank())
-//            throw new BookNotSavedException("Book with isbn " + book.getIsbn() + " already exist");
-
         return bookRepository.save(book);
     }
 
@@ -57,7 +52,7 @@ public class BookService {
 //            throw new BookNotFoundException("Not Book found with isbn " + isbn);
 //        book.setIsbn(isbn);
         //todo перевірити як працює при оновленні авторів і публікацій, чи видаляє старих авторів
-        BeanUtils.copyProperties(book, bookFromDb, "isbn","activeBooks","publication","authors");
+        BeanUtils.copyProperties(book, bookFromDb, "isbn", "activeBooks", "publication", "authors");
 //        BeanUtils.copyProperties(book, bookFromDb, "isbn","activeBooks");
         return bookRepository.save(bookFromDb);
     }
@@ -72,27 +67,31 @@ public class BookService {
     }
 
 
-    public DataPageDto<Book> findBooksByAuthor(int id,Pageable pageable) {
+    public DataPageDto<Book> findBooksByAuthor(int id, Pageable pageable) {
         //думаю не треба, бо як не буде такого автора то просто пустий список книжок
 //        Optional<Author> optionalAuthor = authorRepository.findById(id);
 //        if (optionalAuthor.isEmpty()) throw new AuthorNotFoundException("There are not author with id " + id);
         Page<Book> booksPage = bookRepository.getBooksByAuthorsId(id, pageable);
-        return new DataPageDto<>(booksPage.getContent(),pageable.getPageNumber(),booksPage.getTotalPages());
+        return new DataPageDto<>(booksPage.getContent(), pageable.getPageNumber(), booksPage.getTotalPages());
     }
 
-    public DataPageDto<Book> findBooksByPublication(int id,Pageable pageable) {
+    public DataPageDto<Book> findBooksByPublication(int id, Pageable pageable) {
 //        Optional<Publication> optionalPublication = publicationRepository.findById(id);
 //        if (optionalPublication.isEmpty())
 //            throw new PublicationNotFoundException("There are not publication with id " + id);
-        Page<Book> booksPage = bookRepository.getBooksByPublicationId(id,pageable);
-        return new DataPageDto<>(booksPage.getContent(),pageable.getPageNumber(),booksPage.getTotalPages());
+        Page<Book> booksPage = bookRepository.getBooksByPublicationId(id, pageable);
+        return new DataPageDto<>(booksPage.getContent(), pageable.getPageNumber(), booksPage.getTotalPages());
     }
 
-    public Page<Book> findBooksByName(String name, Pageable pageable) {
-        return bookRepository.getBooksByNameStartingWith(name,pageable);
+    public DataPageDto<Book> findBooksByName(String name, Pageable pageable) {
+        Page<Book> booksByNameContainingIgnoreCase = bookRepository.getBooksByNameContainingIgnoreCase(name, pageable);
+
+        return new DataPageDto<>(booksByNameContainingIgnoreCase.getContent(),
+                pageable.getPageNumber(),
+                booksByNameContainingIgnoreCase.getTotalPages());
     }
 
-
+    @Transactional
     public void delete(Book book) {
         bookRepository.delete(book);
     }

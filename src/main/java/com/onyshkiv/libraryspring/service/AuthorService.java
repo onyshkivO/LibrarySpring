@@ -45,12 +45,9 @@ public class AuthorService {
 
     @Transactional
     public Author updateAuthor(Author authorFromDb, Author author) {
-//        Optional<Author> optionalAuthor = authorRepository.findById(id);
-//        if (optionalAuthor.isEmpty())
-//            throw new AuthorNotFoundException("Not author found with id " + id);
-//        author.setId(id);
         authorFromDb.setName(author.getName());
-        return authorRepository.save(author);
+        return authorFromDb;
+//        return authorRepository.save(authorFromDb);
     }
 
     @Transactional

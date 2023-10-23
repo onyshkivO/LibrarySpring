@@ -26,6 +26,17 @@ public interface BookRepository extends JpaRepository<Book, String> {
     Page<Book> getBooksByPublicationId(int id, Pageable pageable);
 
     @EntityGraph(attributePaths = {"authors","publication"})
-    Page<Book> getBooksByNameStartingWith(String name, Pageable pageable);
+    Page<Book> getBooksByNameContainingIgnoreCase(String name, Pageable pageable);
+
+    /*{
+        "isbn": "1111111111",
+            "name": "test book",
+            "dateOfPublication": "1990-01-15",
+            "quantity": 12,
+            "details": "Test",
+            "publication": {
+        "id": 1
+    }
+    }*/
 
 }

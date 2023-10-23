@@ -43,13 +43,8 @@ public class PublicationService {
 
     @Transactional
     public Publication updatePublication(Publication publicationFromDb, Publication publication) {
-//        Optional<Publication> optionalPublication = publicationRepository.findById(id);
-//        if (optionalPublication.isEmpty())
-//            throw new PublicationNotFoundException("Not publication found with id " + id);
-
-
         publicationFromDb.setName(publication.getName());
-        return publicationRepository.save(publicationFromDb);
+        return publicationFromDb;
     }
 
     @Transactional
