@@ -38,7 +38,7 @@ public class ActiveBook {
     @Column(name = "end_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @JsonView(Views.IdName.class)
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "fine")
     @JsonView(Views.IdName.class)

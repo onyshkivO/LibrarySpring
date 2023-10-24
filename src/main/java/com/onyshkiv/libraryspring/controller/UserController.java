@@ -6,14 +6,11 @@ import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.Role;
 import com.onyshkiv.libraryspring.entity.User;
 import com.onyshkiv.libraryspring.entity.Views;
-import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
 import com.onyshkiv.libraryspring.exception.user.UserNotSavedException;
 import com.onyshkiv.libraryspring.service.UserService;
 import com.onyshkiv.libraryspring.util.UserValidator;
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -22,8 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -31,7 +26,7 @@ public class UserController {
     private final UserValidator userValidator;
 
     @Autowired
-    public UserController(UserService userService, ModelMapper modelMapper, UserValidator userValidator) {
+    public UserController(UserService userService, UserValidator userValidator) {
         this.userService = userService;
         this.userValidator = userValidator;
     }
@@ -46,14 +41,10 @@ public class UserController {
     @GetMapping("/{login}")
     @JsonView(Views.FullUser.class)
     public ResponseEntity<User> getUserByLogin(@PathVariable("login") User user) {
-//        Optional<User> optionalUser = userService.getUserByLogin(login);
-//        if (optionalUser.isEmpty())
-//            throw new UserNotFoundException("Not user found with login " + login);//todo можливо це має робитися через aop і ті advice
-
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-//    @GetMapping("/{login}")
+    //    @GetMapping("/{login}")
 //    @JsonView(Views.FullUser.class)
 //    public ResponseEntity<User> getUserByLogin(@PathVariable("login") String login) {
 //        Optional<User> optionalUser = userService.getUserByLogin(login);
@@ -100,7 +91,8 @@ public class UserController {
         userService.delete(user);
     }
 
-    @PatchMapping("/status/{login}")
+    @PutMapping("/status/{login}")
+    @JsonView(Views.FullUser.class)
     public ResponseEntity<User> changeUserStatus(@PathVariable("login") User user) {
         User updatedUser = userService.changeUserStatus(user);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);

@@ -68,10 +68,14 @@ public class ActiveBookService {
 
         Book book = optionalBook.get();
         book.setQuantity(book.getQuantity() - 1);
-        bookService.updateBook(book, book);
+//        bookService.updateBook(book, book);
 
         activeBook.setSubscriptionStatus(SubscriptionStatus.WAITING);
         activeBook.setStartDate(LocalDate.now());
+//        if (activeBook.getEndDate() == null)
+//            activeBook.setEndDate(LocalDate.now().plusDays(20));
+//        if (activeBook.getFine()==null)
+//            activeBook.setFine(100.00);
         return activeBookRepository.save(activeBook);
     }
 
@@ -87,7 +91,7 @@ public class ActiveBookService {
         //хз просто як то обновляти activeBook
         activeBookFromDb.setFine(activeBook.getFine());
         activeBookFromDb.setEndDate(activeBook.getEndDate());
-        activeBookFromDb.setSubscriptionStatus(activeBook.getSubscriptionStatus());
+        activeBookFromDb.setSubscriptionStatus(SubscriptionStatus.ACTIVE);
         return activeBookRepository.save(activeBookFromDb);
     }
 
@@ -118,6 +122,7 @@ public class ActiveBookService {
 
     @Transactional
     public ActiveBook deleteActiveBookById(int id) {
+
         Optional<ActiveBook> optionalActiveBook = activeBookRepository.findById(id);
         if (optionalActiveBook.isEmpty())
             throw new ActiveBookNotFoundException("There are no active book with id " + id);
@@ -127,15 +132,21 @@ public class ActiveBookService {
         if (optionalBook.isEmpty())
             throw new BookNotFoundException("There are not book with isbn " + isbn);
 
-        Book book = optionalBook.get();
-        book.setQuantity(book.getQuantity() + 1);
-        bookService.updateBook(book, book);
-
+        if (!activeBook.getSubscriptionStatus().equals(SubscriptionStatus.RETURNED)) {
+            Book book = optionalBook.get();
+            book.setQuantity(book.getQuantity() + 1);
+            bookService.updateBook(book, book);
+        }
         activeBookRepository.deleteById(id);
         return activeBook;
     }
 
     public void delete(ActiveBook activeBook) {
+        if (!activeBook.getSubscriptionStatus().equals(SubscriptionStatus.RETURNED)) {
+            Book book = activeBook.getBook();
+            book.setQuantity(book.getQuantity() + 1);
+            bookService.updateBook(book, book);
+        }
         activeBookRepository.delete(activeBook);
     }
 }

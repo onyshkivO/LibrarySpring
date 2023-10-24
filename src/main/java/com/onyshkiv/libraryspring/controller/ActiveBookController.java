@@ -4,6 +4,7 @@ package com.onyshkiv.libraryspring.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.ActiveBook;
+import com.onyshkiv.libraryspring.entity.User;
 import com.onyshkiv.libraryspring.entity.Views;
 import com.onyshkiv.libraryspring.exception.activeBook.ActiveBookNotSavedException;
 import com.onyshkiv.libraryspring.service.ActiveBookService;
@@ -18,6 +19,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/activeBooks")
@@ -42,24 +46,20 @@ public class ActiveBookController {
     @GetMapping("/{id}")
     @JsonView(Views.FullActiveBook.class)
     public ResponseEntity<ActiveBook> getActiveBookById(@PathVariable("id") ActiveBook activeBook) {
-//        Optional<ActiveBook> optionalActiveBook = activeBookService.getActiveBookById(id);
-//        if (optionalActiveBook.isEmpty())
-//            throw new ActiveBookNotFoundException("There are no active book with id " + id);
-
         return new ResponseEntity<>(activeBook, HttpStatus.OK);
     }
 
     @GetMapping("/user/{login}")
     @JsonView(Views.FullActiveBook.class)
-    public ResponseEntity<Page<ActiveBook>> getActiveBooksByUserLogin(
-            @PathVariable("login") String login,
+    public ResponseEntity<Set<ActiveBook>> getActiveBooksByUserLogin(
+            @PathVariable("login") User user,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<ActiveBook> activeBooks = activeBookService.getActiveBooksByUserLogin(login, pageable);
-        return new ResponseEntity<>(activeBooks, HttpStatus.OK);
+//        Page<ActiveBook> activeBooks = activeBookService.getActiveBooksByUserLogin(login, pageable);
+        return new ResponseEntity<>(user.getActiveBooks(), HttpStatus.OK);
     }
 
     @PostMapping()
-
+    @JsonView(Views.FullActiveBook.class)
     public ResponseEntity<ActiveBook> saveActiveBook(@RequestBody @Valid ActiveBook activeBook, BindingResult bindingResult) {
         activeBookValidator.validate(activeBook, bindingResult);
         if (bindingResult.hasErrors())
@@ -81,7 +81,7 @@ public class ActiveBookController {
         return new ResponseEntity<>(updatedActiveBook, HttpStatus.OK);
     }
 
-    @PatchMapping("/return/{id}")
+    @PutMapping("/return/{id}")
     @JsonView(Views.FullActiveBook.class)
     public ResponseEntity<ActiveBook> returnActiveBook(@PathVariable("id") ActiveBook activeBook) {
         ActiveBook updatedActiveBook = activeBookService.returnActiveBook(activeBook);

@@ -31,14 +31,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(HttpMethod.GET, "/books").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/activeBooks/return/{id}", "/activeBooks/{id}"
                                 , "/authors/{id}", "/books/{isbn}", "/publications/{id}", "/users/{login}", "/users/status/{login}").hasAnyRole("LIBRARIAN", "ADMINISTRATOR")
                         .requestMatchers(HttpMethod.PUT, "/users/status/{login}").hasRole("ADMINISTRATOR")
                         .requestMatchers(HttpMethod.POST, "/authors", "/books", "/publications", "/users/librarian").hasRole("ADMINISTRATOR")
-                        .requestMatchers(HttpMethod.DELETE, "/activeBooks/{id}").hasRole("LIBRARIAN")
-                        .requestMatchers(HttpMethod.DELETE, "/activeBooks/{id}", "/authors/{id}", "/publications/{id}", "/users/{login}", "/books/{isbn}").hasRole("ADMINISTRATOR")
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
-//                        .anyRequest().hasAnyRole("ADMINISTRATOR", "USER", "LIBRARIAN")
+                        .requestMatchers(HttpMethod.DELETE, "/activeBooks/{id}").hasAnyRole("LIBRARIAN","ADMINISTRATOR")
+                        .requestMatchers(HttpMethod.DELETE,  "/authors/{id}", "/publications/{id}", "/users/{login}", "/books/{isbn}").hasRole("ADMINISTRATOR")
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())

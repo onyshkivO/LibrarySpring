@@ -51,22 +51,12 @@ public class UserService {
 
     @Transactional
     public User updateUser(User userFromDb, User user) {
-//        Optional<User> optionalUser = userRepository.findById(login);
-//        if (optionalUser.isEmpty())
-//            throw new UserNotFoundException("Not user found with login " + login);
-
-
-        //todo попробувати оновити книжки активні користувача і чи це вийде
-
         BeanUtils.copyProperties(user, userFromDb, "login","password","role","userStatus","activeBooks");
-//        BeanUtils.copyProperties(user, userFromDb, "login","password","role","userStatus");
-
         return userRepository.save(userFromDb);
     }
 
     @Transactional
     public User changeUserStatus(User user){
-//       user!=null хз чи треба перевіряти
 
         if (user.getUserStatus().equals(UserStatus.ACTIVE)) {
             user.setUserStatus(UserStatus.BLOCKED);

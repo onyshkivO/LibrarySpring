@@ -42,11 +42,11 @@ public class User{
     @Email(message = "Bad email")
     @JsonView(Views.IdName.class)
     private String email;
-
+//to do user dto для паролю
     @Column(name = "password",nullable = false)
     @NotBlank(message = "Bad password1")
     @NotNull(message = "Bad password2")
-    @Pattern(regexp = "^[A-Za-z0-9_-]{6,18}$", message = "Bad password3")
+    @Pattern(regexp = "^[$\\/A-Za-z0-9_-]{6,60}$", message = "Bad password3")
     private String password;
 
     @Column(name = "first_name",nullable = false)
