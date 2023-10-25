@@ -140,7 +140,7 @@ public class ActiveBookService {
         activeBookRepository.deleteById(id);
         return activeBook;
     }
-
+    @Transactional
     public void delete(ActiveBook activeBook) {
         if (!activeBook.getSubscriptionStatus().equals(SubscriptionStatus.RETURNED)) {
             Book book = activeBook.getBook();

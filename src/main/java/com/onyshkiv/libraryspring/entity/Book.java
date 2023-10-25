@@ -63,15 +63,15 @@ public class Book {
     @JsonView(Views.Full.class)
     private Set<ActiveBook> activeBooks;
 
-    @ManyToOne
-    @JoinColumn(name = "publication_id", referencedColumnName = "id",nullable = false)
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "publication_id", referencedColumnName = "id")
     @JsonView(Views.FullBook.class)
     private Publication publication;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "book_has_authors",
-            joinColumns = @JoinColumn(name = "b_isbn",referencedColumnName = "isbn"),
-            inverseJoinColumns = @JoinColumn(name = "a_id",referencedColumnName = "id"))
+            joinColumns = @JoinColumn(name = "b_isbn",referencedColumnName = "isbn",nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "a_id",referencedColumnName = "id",nullable = false))
     @JsonView(Views.FullBook.class)
     private Set<Author> authors = new HashSet<>();
 

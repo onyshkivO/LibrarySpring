@@ -58,6 +58,7 @@ public class PublicationService {
 
     @Transactional
     public void delete(Publication publication) {
+        publication.getBooks().forEach(book->book.setPublication(null));
         publicationRepository.delete(publication);
     }
 }
