@@ -52,8 +52,8 @@ public class BookService {
 //            throw new BookNotFoundException("Not Book found with isbn " + isbn);
 //        book.setIsbn(isbn);
         //todo перевірити як працює при оновленні авторів і публікацій, чи видаляє старих авторів
-        BeanUtils.copyProperties(book, bookFromDb, "isbn", "activeBooks", "publication", "authors");
-//        BeanUtils.copyProperties(book, bookFromDb, "isbn","activeBooks");
+        //BeanUtils.copyProperties(book, bookFromDb, "isbn", "activeBooks", "publication", "authors");
+        BeanUtils.copyProperties(book, bookFromDb, "isbn","activeBooks");
         return bookRepository.save(bookFromDb);
     }
 

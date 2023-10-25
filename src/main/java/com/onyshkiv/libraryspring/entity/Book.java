@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -63,12 +64,15 @@ public class Book {
     @JsonView(Views.Full.class)
     private Set<ActiveBook> activeBooks;
 
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "publication_id", referencedColumnName = "id")
+    @NotNull(message = "publication cannot be null")
     @JsonView(Views.FullBook.class)
     private Publication publication;
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @NotNull(message = "authors cannot be null")
+    @NotEmpty(message = "authors cannot be empty")
     @JoinTable(name = "book_has_authors",
             joinColumns = @JoinColumn(name = "b_isbn",referencedColumnName = "isbn",nullable = false),
             inverseJoinColumns = @JoinColumn(name = "a_id",referencedColumnName = "id",nullable = false))
