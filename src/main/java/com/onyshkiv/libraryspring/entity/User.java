@@ -75,7 +75,7 @@ public class User{
     @Column(name = "status",nullable = false)
     private UserStatus userStatus;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE)
     @JsonView(Views.FullUser.class)
     private Set<ActiveBook> activeBooks;
 

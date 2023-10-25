@@ -1,9 +1,7 @@
 package com.onyshkiv.libraryspring.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -13,8 +11,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -22,7 +18,7 @@ import java.util.Set;
 
 @Data
 @NoArgsConstructor
-@ToString(of = {"isbn","name"})
+@ToString(of = {"isbn", "name"})
 @EqualsAndHashCode(of = {"isbn"})
 @Entity
 @Table(name = "book")
@@ -34,7 +30,7 @@ public class Book {
     @Id
     @Column(name = "isbn")
     @NotNull(message = "Bad book isbn")
-    @Pattern(regexp = "^(?=(?:\\D?\\d){10}(?:(?:\\D?\\d){3})?$)[\\d-]+?$",message = "Bad book isbn")
+    @Pattern(regexp = "^(?=(?:\\D?\\d){10}(?:(?:\\D?\\d){3})?$)[\\d-]+?$", message = "Bad book isbn")
     @JsonView(Views.Id.class)
     private String isbn;
 
@@ -55,12 +51,11 @@ public class Book {
     private Integer quantity;
 
 
-
     @Column(name = "details")
     @JsonView(Views.FullBook.class)
     private String details;
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book",cascade = CascadeType.REMOVE)
     @JsonView(Views.Full.class)
     private Set<ActiveBook> activeBooks;
 
@@ -74,8 +69,8 @@ public class Book {
     @NotNull(message = "authors cannot be null")
     @NotEmpty(message = "authors cannot be empty")
     @JoinTable(name = "book_has_authors",
-            joinColumns = @JoinColumn(name = "b_isbn",referencedColumnName = "isbn",nullable = false),
-            inverseJoinColumns = @JoinColumn(name = "a_id",referencedColumnName = "id",nullable = false))
+            joinColumns = @JoinColumn(name = "b_isbn", referencedColumnName = "isbn", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "a_id", referencedColumnName = "id", nullable = false))
     @JsonView(Views.FullBook.class)
     private Set<Author> authors = new HashSet<>();
 

@@ -29,6 +29,7 @@ public class ActiveBookValidator implements Validator {
     public void validate(Object target, Errors errors) {
         ActiveBook activeBook = (ActiveBook) target;
         String bookIsbn = activeBook.getBook().getIsbn();
+        System.out.println(bookIsbn);
         Optional<Book> optionalBook = bookService.getBookByIsbn(bookIsbn);
         if (optionalBook.isEmpty() || optionalBook.get().getQuantity() < 1)
             errors.rejectValue("isbnOrQuantity", "", "There are not available book with isbn " + bookIsbn);
