@@ -59,6 +59,7 @@ public class AuthorService {
 
     @Transactional
     public void delete(Author author) {
+        author.getBooks().forEach(book->book.getAuthors().remove(author)); //test this
         authorRepository.delete(author);
     }
 }

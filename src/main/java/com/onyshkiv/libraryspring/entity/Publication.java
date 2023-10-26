@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -27,10 +28,14 @@ public class Publication {
 
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "publication")
     @JsonView(Views.FullPublication.class)
-    private Set<Book> books;
+    private Set<Book> books = new HashSet<>();
 
     public Publication(int id, String name) {
         this.id = id;
+        this.name=name;
+    }
+
+    public Publication(String name) {
         this.name=name;
     }
 }
