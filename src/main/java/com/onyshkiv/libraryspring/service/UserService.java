@@ -1,9 +1,10 @@
 package com.onyshkiv.libraryspring.service;
 
 import com.onyshkiv.libraryspring.dto.DataPageDto;
-import com.onyshkiv.libraryspring.entity.*;
+import com.onyshkiv.libraryspring.entity.Role;
+import com.onyshkiv.libraryspring.entity.User;
+import com.onyshkiv.libraryspring.entity.UserStatus;
 import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
-import com.onyshkiv.libraryspring.exception.user.UserNotSavedException;
 import com.onyshkiv.libraryspring.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,13 +39,9 @@ public class UserService {
 
     @Transactional
     public User saveUser(User user, Role role) {
-//        Optional<User> optionalUser = userRepository.findById(user.getLogin());
-//        if (optionalUser.isPresent() || user.getLogin().isBlank())
-//            throw new UserNotSavedException("User with login " + user.getLogin() + " already exist");// можливо зайве, бо є валідатор
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRole(role);
         user.setUserStatus(UserStatus.ACTIVE);
-
         return userRepository.save(user);
     }
 

@@ -62,20 +62,11 @@ public class ActiveBookService {
         }
 
         String isbn = activeBook.getBook().getIsbn();
-        Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
-        if (optionalBook.isEmpty())
-            throw new BookNotFoundException("There are not book with isbn " + isbn);
-
-        Book book = optionalBook.get();
+        Book book = bookService.getBookByIsbn(isbn);
         book.setQuantity(book.getQuantity() - 1);
-//        bookService.updateBook(book, book);
 
         activeBook.setSubscriptionStatus(SubscriptionStatus.WAITING);
         activeBook.setStartDate(LocalDate.now());
-//        if (activeBook.getEndDate() == null)
-//            activeBook.setEndDate(LocalDate.now().plusDays(20));
-//        if (activeBook.getFine()==null)
-//            activeBook.setFine(100.00);
         return activeBookRepository.save(activeBook);
     }
 
@@ -103,15 +94,14 @@ public class ActiveBookService {
 //        ActiveBook activeBook = optionalActiveBook.get();
 
         String isbn = activeBook.getBook().getIsbn();
-        Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
-        if (optionalBook.isEmpty())
-            throw new BookNotFoundException("There are not book with isbn " + isbn);//зайве напевно
 
-        Book book = optionalBook.get();
+        Book book = bookService.getBookByIsbn(isbn);
         book.setQuantity(book.getQuantity() + 1);
         bookService.updateBook(book, book);
 
         activeBook.setSubscriptionStatus(SubscriptionStatus.RETURNED);
+
+        //todo попробувати це забрати
         return activeBookRepository.save(activeBook);
 //        activeBookRepository.updateSubscriptionStatus(activeBook.getId(),SubscriptionStatus.RETURNED);
 ////перевірити, чи можна так, адже я вже отримую через PathVariable
@@ -119,27 +109,6 @@ public class ActiveBookService {
 //        return activeBook;
     }
 
-
-    @Transactional
-    public ActiveBook deleteActiveBookById(int id) {
-
-        Optional<ActiveBook> optionalActiveBook = activeBookRepository.findById(id);
-        if (optionalActiveBook.isEmpty())
-            throw new ActiveBookNotFoundException("There are no active book with id " + id);
-        ActiveBook activeBook = optionalActiveBook.get();
-        String isbn = activeBook.getBook().getIsbn();
-        Optional<Book> optionalBook = bookService.getBookByIsbn(isbn);
-        if (optionalBook.isEmpty())
-            throw new BookNotFoundException("There are not book with isbn " + isbn);
-
-        if (!activeBook.getSubscriptionStatus().equals(SubscriptionStatus.RETURNED)) {
-            Book book = optionalBook.get();
-            book.setQuantity(book.getQuantity() + 1);
-            bookService.updateBook(book, book);
-        }
-        activeBookRepository.deleteById(id);
-        return activeBook;
-    }
     @Transactional
     public void delete(ActiveBook activeBook) {
         if (!activeBook.getSubscriptionStatus().equals(SubscriptionStatus.RETURNED)) {

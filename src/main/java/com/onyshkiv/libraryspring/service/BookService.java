@@ -35,8 +35,9 @@ public class BookService {
         return new DataPageDto<>(booksPage.getContent(), pageable.getPageNumber(), booksPage.getTotalPages());
     }
 
-    public Optional<Book> getBookByIsbn(String isbn) {
-        return bookRepository.findById(isbn);
+    public Book getBookByIsbn(String isbn) {
+        return bookRepository.findById(isbn)
+                .orElseThrow(() -> new BookNotFoundException("There are not book with isbn" + isbn));
     }
 
 
@@ -53,7 +54,7 @@ public class BookService {
 //        book.setIsbn(isbn);
         //todo перевірити як працює при оновленні авторів і публікацій, чи видаляє старих авторів
         //BeanUtils.copyProperties(book, bookFromDb, "isbn", "activeBooks", "publication", "authors");
-        BeanUtils.copyProperties(book, bookFromDb, "isbn","activeBooks");
+        BeanUtils.copyProperties(book, bookFromDb, "isbn", "activeBooks");
         return bookRepository.save(bookFromDb);
     }
 
@@ -67,6 +68,7 @@ public class BookService {
     }
 
 
+    //todo переробити, щоб отримував Publication а не просто id і тоді просто getBooks;
     public DataPageDto<Book> findBooksByAuthor(int id, Pageable pageable) {
         //думаю не треба, бо як не буде такого автора то просто пустий список книжок
 //        Optional<Author> optionalAuthor = authorRepository.findById(id);

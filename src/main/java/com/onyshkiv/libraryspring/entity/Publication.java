@@ -3,15 +3,13 @@ package com.onyshkiv.libraryspring.entity;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Set;
 
 @Data
 @NoArgsConstructor
+
 @Entity
 @ToString(of={"id","name"})
 @EqualsAndHashCode(of={"id"})
@@ -31,5 +29,9 @@ public class Publication {
     @JsonView(Views.FullPublication.class)
     private Set<Book> books;
 
+    public Publication(int id, String name) {
+        this.id = id;
+        this.name=name;
+    }
 }
 

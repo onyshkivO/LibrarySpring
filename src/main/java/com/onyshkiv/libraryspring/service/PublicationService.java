@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -29,8 +28,9 @@ public class PublicationService {
         return new DataPageDto<>(publicationsPage.getContent(),pageable.getPageNumber(),publicationsPage.getTotalPages());
     }
 
-    public Optional<Publication> getPublicationById(int id) {
-        return publicationRepository.findById(id);
+    public Publication getPublicationById(int id) {
+        return publicationRepository.findById(id)
+                .orElseThrow(()->new PublicationNotFoundException("there are not publication with id " + id));
     }
 
 

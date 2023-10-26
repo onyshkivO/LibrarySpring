@@ -1,6 +1,7 @@
 package com.onyshkiv.libraryspring.util;
 
 import com.onyshkiv.libraryspring.entity.Book;
+import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -24,8 +25,12 @@ public class BookValidator implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         Book book = (Book) target;
-        if (bookService.getBookByIsbn(book.getIsbn()).isPresent())
+        try {
+            bookService.getBookByIsbn(book.getIsbn());
             errors.rejectValue("isbn", "", "Book with isbn " + book.getIsbn() + " already exist");
+        }catch (BookNotFoundException ignored){
+            //log
+        }
 
     }
 }
