@@ -45,10 +45,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    //todo метод для зміни паролю
     @Transactional
     public User updateUser(User userFromDb, User user) {
         BeanUtils.copyProperties(user, userFromDb, "login","password","role","userStatus","activeBooks");
-        return userRepository.save(userFromDb);
+        return userRepository.save(userFromDb);//todo перевірити чи буде працювати якщо це забрати
     }
 
     @Transactional
@@ -64,14 +65,6 @@ public class UserService {
 
     }
 
-    @Transactional
-    public User deleteUserByLogin(String login) {
-        Optional<User> optionalUser = userRepository.findById(login);
-        if (optionalUser.isEmpty())
-            throw new UserNotFoundException("Not user found with login " + login);
-        userRepository.deleteById(login);
-        return optionalUser.get();
-    }
     @Transactional
     public void delete(User user) {
         userRepository.delete(user);

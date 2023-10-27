@@ -49,15 +49,6 @@ public class AuthorService {
     }
 
     @Transactional
-    public Author deleteAuthorById(int id) {
-        Optional<Author> optionalAuthor = authorRepository.findById(id);
-        if (optionalAuthor.isEmpty())
-            throw new AuthorNotFoundException("Not author found with id " + id);
-        authorRepository.deleteById(id);
-        return optionalAuthor.get();
-    }
-
-    @Transactional
     public void delete(Author author) {
         author.getBooks().forEach(book->book.getAuthors().remove(author)); //test this
         authorRepository.delete(author);

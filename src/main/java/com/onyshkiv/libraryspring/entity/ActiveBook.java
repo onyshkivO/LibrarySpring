@@ -3,15 +3,16 @@ package com.onyshkiv.libraryspring.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Date;
 
-@Data
+
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @ToString(of={"id"})
@@ -53,4 +54,8 @@ public class ActiveBook {
     @JoinColumn(name = "book_isbn", referencedColumnName = "isbn",nullable = false)
     @JsonView(Views.IdName.class)
     private Book book;
+
+    public ActiveBook(int id) {
+        this.id = id;
+    }
 }

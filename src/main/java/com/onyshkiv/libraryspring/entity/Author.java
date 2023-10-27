@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -34,6 +35,14 @@ public class Author {
             joinColumns = @JoinColumn(name = "a_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "b_isbn", referencedColumnName = "isbn"))
     @JsonView(Views.FullAuthor.class)
-    private Set<Book> books;
+    private Set<Book> books = new HashSet<>();
 
+    public Author(int id, String name) {
+        this.id=id;
+        this.name=name;
+    }
+
+    public Author(String name) {
+        this.name=name;
+    }
 }

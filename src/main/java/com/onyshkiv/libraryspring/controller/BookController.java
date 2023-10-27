@@ -4,6 +4,7 @@ package com.onyshkiv.libraryspring.controller;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.Book;
+import com.onyshkiv.libraryspring.entity.Publication;
 import com.onyshkiv.libraryspring.entity.Views;
 import com.onyshkiv.libraryspring.exception.book.BookNotSavedException;
 import com.onyshkiv.libraryspring.service.BookService;

@@ -7,17 +7,19 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+
+
+@Builder
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString(of = {"isbn", "name"})
 @EqualsAndHashCode(of = {"isbn"})
 @Entity
@@ -57,7 +59,7 @@ public class Book {
 
     @OneToMany(mappedBy = "book",cascade = CascadeType.REMOVE)
     @JsonView(Views.Full.class)
-    private Set<ActiveBook> activeBooks;
+    private Set<ActiveBook> activeBooks = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "publication_id", referencedColumnName = "id")
@@ -73,5 +75,14 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "a_id", referencedColumnName = "id", nullable = false))
     @JsonView(Views.FullBook.class)
     private Set<Author> authors = new HashSet<>();
+
+    public Book(@NotNull(message = "Bad book isbn") String isbn, @NotNull(message = "Bad book name") String name, LocalDate dateOfPublication, @NotNull(message = "Bad quantity value") Integer quantity, String details, @NotNull(message = "publication cannot be null") Publication publication) {
+        this.isbn = isbn;
+        this.name = name;
+        this.dateOfPublication = dateOfPublication;
+        this.quantity = quantity;
+        this.details = details;
+        this.publication = publication;
+    }
 
 }
