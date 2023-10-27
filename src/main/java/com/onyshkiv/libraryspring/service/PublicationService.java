@@ -48,15 +48,6 @@ public class PublicationService {
     }
 
     @Transactional
-    public Publication deletePublicationById(int id) {
-        Optional<Publication> optionalPublication = publicationRepository.findById(id);
-        if (optionalPublication.isEmpty())
-            throw new PublicationNotFoundException("Not publication found with id " + id);
-        publicationRepository.deleteById(id);
-        return optionalPublication.get();
-    }
-
-    @Transactional
     public void delete(Publication publication) {
         publication.getBooks().forEach(book->book.setPublication(null));
         publicationRepository.delete(publication);

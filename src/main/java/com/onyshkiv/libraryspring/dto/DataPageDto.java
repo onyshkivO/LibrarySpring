@@ -1,6 +1,5 @@
 package com.onyshkiv.libraryspring.dto;
 
-import com.fasterxml.jackson.annotation.JsonRawValue;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.onyshkiv.libraryspring.entity.Views;
 import lombok.AllArgsConstructor;
