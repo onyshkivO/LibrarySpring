@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/publications")
@@ -34,6 +36,7 @@ public class PublicationController {
         DataPageDto<Publication> publications = publicationService.getAllPublications(pageable);
         return new ResponseEntity<>(publications, HttpStatus.OK);
     }
+
 
     @GetMapping("/{id}")
     @JsonView(Views.FullPublication.class)
