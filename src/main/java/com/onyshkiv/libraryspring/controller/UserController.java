@@ -19,6 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+
+
+//todo ендпоінти щоб отримати окремо читачів і окремо бібліотекарів
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -40,20 +43,10 @@ public class UserController {
 
     @GetMapping("/{login}")
     @JsonView(Views.FullUser.class)
-    public ResponseEntity<User> getUserByLogin(@PathVariable("login") User user) {
+    public ResponseEntity<User> getUserByLogin(@PathVariable("login") String login) {
+        User user = userService.getUserByLogin(login);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
-
-    //    @GetMapping("/{login}")
-//    @JsonView(Views.FullUser.class)
-//    public ResponseEntity<User> getUserByLogin(@PathVariable("login") String login) {
-//        Optional<User> optionalUser = userService.getUserByLogin(login);
-//        if (optionalUser.isEmpty())
-//            throw new UserNotFoundException("Not user found with login " + login);//todo можливо це має робитися через aop і ті advice
-//
-//
-//        return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
-//    }
     @PostMapping()
     @JsonView(Views.IdName.class)
     public ResponseEntity<User> saveUser(@RequestBody @Valid User user, BindingResult bindingResult) {
@@ -77,24 +70,24 @@ public class UserController {
 
     @PutMapping("/{login}")
     @JsonView(Views.FullUser.class)
-    public ResponseEntity<User> updateUser(@PathVariable("login") User userFromDb,
+    public ResponseEntity<User> updateUser(@PathVariable("login") String login,
                                            @RequestBody @Valid User user,
                                            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) throw new UserNotSavedException(bindingResult.getFieldErrors().toString());
-        User updatedUser = userService.updateUser(userFromDb, user);
+        User updatedUser = userService.updateUser(login, user);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
     @DeleteMapping("/{login}")
     @JsonView(Views.IdName.class)
-    public void deleteUserByLogin(@PathVariable("login") User user) {
-        userService.delete(user);
+    public void deleteUserByLogin(@PathVariable("login") String login) {
+        userService.delete(login);
     }
 
     @PutMapping("/status/{login}")
     @JsonView(Views.FullUser.class)
-    public ResponseEntity<User> changeUserStatus(@PathVariable("login") User user) {
-        User updatedUser = userService.changeUserStatus(user);
+    public ResponseEntity<User> changeUserStatus(@PathVariable("login") String login) {
+        User updatedUser = userService.changeUserStatus(login);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
 
     }

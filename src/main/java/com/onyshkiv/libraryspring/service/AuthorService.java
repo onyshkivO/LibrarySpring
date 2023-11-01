@@ -11,8 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @Transactional(readOnly = true)
 public class AuthorService {
@@ -43,14 +41,16 @@ public class AuthorService {
     }
 
     @Transactional
-    public Author updateAuthor(Author authorFromDb, Author author) {
+    public Author updateAuthor(int id, Author author) {
+        Author authorFromDb = getAuthorById(id);
         authorFromDb.setName(author.getName());
         return authorFromDb;
     }
 
     @Transactional
-    public void delete(Author author) {
-        author.getBooks().forEach(book->book.getAuthors().remove(author)); //test this
+    public void delete(int id) {
+        Author author = getAuthorById(id);
+        author.getBooks().forEach(book -> book.getAuthors().remove(author)); //test this
         authorRepository.delete(author);
     }
 }

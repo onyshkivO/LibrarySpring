@@ -1,6 +1,8 @@
 package com.onyshkiv.libraryspring.util;
 
 import com.onyshkiv.libraryspring.entity.User;
+import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
+import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
 import com.onyshkiv.libraryspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,9 +25,12 @@ public class UserValidator implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
-        User user  = (User) target;
-        if (userService.getUserByLogin(user.getLogin()).isPresent()){
-            errors.rejectValue("login","","User login already exist");
+        User user = (User) target;
+        try {
+            userService.getUserByLogin(user.getLogin());
+            errors.rejectValue("login", "", "User login already exist");
+        } catch (UserNotFoundException ignored) {
+            //log
         }
     }
 }

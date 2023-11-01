@@ -2,6 +2,7 @@ package com.onyshkiv.libraryspring.service;
 
 import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.Author;
+import com.onyshkiv.libraryspring.entity.Publication;
 import com.onyshkiv.libraryspring.exception.author.AuthorNotFoundException;
 import com.onyshkiv.libraryspring.exception.author.AuthorNotSavedException;
 import com.onyshkiv.libraryspring.repository.AuthorRepository;
@@ -95,14 +96,18 @@ public class AuthorServiceTest {
     public void updateAuthorTest() {
         Author authorFromDb = new Author(1, "Author");
         Author author = new Author("Author(Updated)");
-        authorFromDb = authorService.updateAuthor(authorFromDb, author);
+        when(authorRepository.findById(any())).thenReturn(Optional.of(authorFromDb));
+        authorFromDb = authorService.updateAuthor(1, author);
         assertThat(authorFromDb.getId()).isEqualTo(1);
         assertThat(authorFromDb.getName()).isEqualTo("Author(Updated)");
+        verify(authorRepository,times(1)).findById(anyInt());
     }
 
     @Test
     public void deleteAuthorTest() {
-        authorService.delete(new Author());
-        verify(authorRepository).delete(any());
+        when(authorRepository.findById(any())).thenReturn(Optional.of(new Author()));
+        authorService.delete(anyInt());
+        verify(authorRepository,times(1)).delete(any());
+        verify(authorRepository, times(1)).findById(anyInt());
     }
 }

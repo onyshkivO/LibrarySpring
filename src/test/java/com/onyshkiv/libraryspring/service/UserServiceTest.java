@@ -1,10 +1,10 @@
 package com.onyshkiv.libraryspring.service;
 
 import com.onyshkiv.libraryspring.dto.DataPageDto;
-import com.onyshkiv.libraryspring.entity.Author;
 import com.onyshkiv.libraryspring.entity.Role;
 import com.onyshkiv.libraryspring.entity.User;
 import com.onyshkiv.libraryspring.entity.UserStatus;
+import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
 import com.onyshkiv.libraryspring.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -45,7 +46,7 @@ public class UserServiceTest {
         when(userRepository.findById(anyString()))
                 .thenReturn(Optional.of(user));
 
-        user = userService.getUserByLogin(anyString()).get();
+        user = userService.getUserByLogin(anyString());
         assertThat(user.getLogin()).isEqualTo("user");
         assertThat(user.getEmail()).isEqualTo("user@gmail.com");
         assertThat(user.getPassword()).isEqualTo("123");
@@ -56,9 +57,8 @@ public class UserServiceTest {
     public void getUserByLoginWhenNotExistTest() {
         when(userRepository.findById(anyString()))
                 .thenReturn(Optional.empty());
-
-        Optional<User> optionalUser = userService.getUserByLogin(anyString());
-        assertThat(optionalUser.isEmpty()).isTrue();
+        assertThatThrownBy(() -> userService.getUserByLogin(anyString()))
+                .isInstanceOf(UserNotFoundException.class);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void saveUserTest(){
+    public void saveUserTest() {
         User user = User.builder()
                 .login("user")
                 .email("user@gmail.com")
@@ -118,12 +118,12 @@ public class UserServiceTest {
         assertThat(user.getUserStatus()).isEqualTo(UserStatus.ACTIVE);
         assertThat(user.getRole()).isEqualTo(Role.ROLE_READER);
 
-        verify(passwordEncoder,times(1)).encode(anyString());
-        verify(userRepository,times(1)).save(any());
+        verify(passwordEncoder, times(1)).encode(anyString());
+        verify(userRepository, times(1)).save(any());
     }
 
     @Test
-    public void updateUserTest(){
+    public void updateUserTest() {
         User userFromDb = User.builder()
                 .login("user")
                 .email("user@gmail.com")
@@ -140,7 +140,8 @@ public class UserServiceTest {
                 .phone("123(updated)")
                 .password("not copied")
                 .build();
-        userService.updateUser(userFromDb,user);
+        when(userRepository.findById(any())).thenReturn(Optional.of(userFromDb));
+        userService.updateUser("user", user);
         assertThat(userFromDb.getLogin()).isEqualTo("user");
         assertThat(userFromDb.getEmail()).isEqualTo("user(updated)@gmail.com");
         assertThat(userFromDb.getPassword()).isEqualTo("123");
@@ -148,10 +149,12 @@ public class UserServiceTest {
         assertThat(userFromDb.getLastName()).isEqualTo("name(updated)");
         assertThat(userFromDb.getPhone()).isEqualTo("123(updated)");
 
-        verify(userRepository,times(1)).save(any());
+//        verify(userRepository, times(1)).save(any()); //я то тестую чи можна забрати
+        verify(userRepository, times(1)).findById(anyString());
     }
+
     @Test
-    public void changeUserStatusTest(){
+    public void changeUserStatusTest() {
         User user = User.builder()
                 .login("user")
                 .email("user@gmail.com")
@@ -161,18 +164,19 @@ public class UserServiceTest {
                 .password("123")
                 .userStatus(UserStatus.ACTIVE)
                 .build();
-        userService.changeUserStatus(user);
+        when(userRepository.findById(any())).thenReturn(Optional.of(user));
+        userService.changeUserStatus(anyString());
         assertThat(user.getUserStatus()).isEqualTo(UserStatus.BLOCKED);
+        verify(userRepository, times(1)).findById(anyString());
     }
 
     @Test
-    public void deleteUser(){
-        userService.delete(new User());
-        verify(userRepository).delete(any());
+    public void deleteUser() {
+        when(userRepository.findById(any())).thenReturn(Optional.of(new User()));
+        userService.delete(anyString());
+        verify(userRepository, times(1)).delete(any());
+        verify(userRepository, times(1)).findById(anyString());
     }
-
-
-
 
 
 }
