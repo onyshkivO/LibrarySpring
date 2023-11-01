@@ -44,7 +44,6 @@ public class BookController {
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
-    //todo якщо я просто хотів книжки якогось автора то можна просто метод getBooks викликати відповідного автора чи публікації
     @GetMapping("/author/{id}")
     @JsonView(Views.FullBook.class)
     public ResponseEntity<DataPageDto<Book>> getBooksByAuthorId(@PathVariable("id") int id, @PageableDefault Pageable pageable) {
@@ -69,15 +68,14 @@ public class BookController {
 
     @GetMapping("/{isbn}")
     @JsonView(Views.FullBook.class)
-    public ResponseEntity<Book> getBookByIsbn(@PathVariable("isbn") Book book) {
+    public ResponseEntity<Book> getBookByIsbn(@PathVariable("isbn") String isbn) {
+        Book book = bookService.getBookByIsbn(isbn);
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
-    //todo перевірити що буде, якщо там не задати авторів або/і публікацію(так воно ламається, тому якось то пофіксити)
     @PostMapping()
     @JsonView(Views.FullBook.class)
     public ResponseEntity<Book> saveBook(@RequestBody @Valid Book book, BindingResult bindingResult) {
-        System.out.println(book.getAuthors());
         bookValidator.validate(book, bindingResult);
         if (bindingResult.hasErrors()) throw new BookNotSavedException(bindingResult.getFieldErrors().toString());
         Book savedBook = bookService.saveBook(book);
@@ -89,17 +87,18 @@ public class BookController {
     //todo зробити може щоб якось і міняти і авторів і публікації
     @PutMapping("/{isbn}")
     @JsonView(Views.FullBook.class)
-    public ResponseEntity<Book> updateBook(@PathVariable("isbn") Book bookFromDb, @RequestBody @Valid Book book, BindingResult bindingResult) {
+    public ResponseEntity<Book> updateBook(@PathVariable("isbn") String isbn, @RequestBody @Valid Book book, BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new BookNotSavedException(bindingResult.getFieldErrors().toString());
 
-        Book updatedBook = bookService.updateBook(bookFromDb, book);
+        Book updatedBook = bookService.updateBook(isbn, book);
         return new ResponseEntity<>(updatedBook, HttpStatus.OK);
     }
 
     @DeleteMapping("/{isbn}")
-    public void deleteBookByIsbn(@PathVariable("isbn") Book book) {
-        bookService.delete(book);
+    public void deleteBookByIsbn(@PathVariable("isbn") String isbn) {
+
+        bookService.delete(isbn);
     }
 
 

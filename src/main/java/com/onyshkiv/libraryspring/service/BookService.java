@@ -39,15 +39,16 @@ public class BookService {
     }
 
     @Transactional
-    public Book updateBook(Book bookFromDb, Book book) {
+    public Book updateBook(String isbn, Book book) {
+        Book bookFromDb = getBookByIsbn(isbn);
         //todo можливо ліпше забрати тут оновлення авторів і публікацій і просто інші методи для цього зробити
-        //BeanUtils.copyProperties(book, bookFromDb, "isbn", "activeBooks", "publication", "authors");
-        BeanUtils.copyProperties(book, bookFromDb, "isbn", "activeBooks");
-        return bookRepository.save(bookFromDb); //todo перевірити чи можна це забрати
+        BeanUtils.copyProperties(book, bookFromDb, "isbn", "activeBooks", "publication", "authors");
+//        BeanUtils.copyProperties(book, bookFromDb, "isbn", "activeBooks");
+        return bookFromDb;
+//        return bookRepository.save(bookFromDb); //todo перевірити чи можна це забрати
     }
 
 
-    //todo переробити, щоб отримував Publication а не просто id і тоді просто getBooks;
     public DataPageDto<Book> findBooksByAuthor(int id, Pageable pageable) {
         Page<Book> booksPage = bookRepository.getBooksByAuthorsId(id, pageable);
         return new DataPageDto<>(booksPage.getContent(), pageable.getPageNumber(), booksPage.getTotalPages());
@@ -66,9 +67,10 @@ public class BookService {
     }
 
     @Transactional
-    public void delete(Book book) {
+    public void delete(String isbn) {
+        Book book = getBookByIsbn(isbn);
         book.getPublication().getBooks().remove(book);
-        book.getAuthors().forEach(author->author.getBooks().remove(book));
+        book.getAuthors().forEach(author -> author.getBooks().remove(book));
         bookRepository.delete(book);
     }
 }
