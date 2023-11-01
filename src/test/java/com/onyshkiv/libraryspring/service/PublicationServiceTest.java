@@ -10,15 +10,18 @@ import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(PublicationService.class)
@@ -48,6 +51,7 @@ public class PublicationServiceTest {
 
         assertThatThrownBy(() -> publicationService.getPublicationById(anyInt()))
                 .isInstanceOf(PublicationNotFoundException.class);
+        verify(publicationRepository, times(1)).findById(anyInt());
     }
 
     @Test
@@ -70,6 +74,7 @@ public class PublicationServiceTest {
         assertThat(publications.get(1).getName()).isEqualTo("Publication2");
         assertThat(publications.get(2).getId()).isEqualTo(3);
         assertThat(publications.get(2).getName()).isEqualTo("Publication3");
+        verify(publicationRepository, times(1)).findAll((Pageable) any());
     }
 
     @Test
@@ -93,15 +98,19 @@ public class PublicationServiceTest {
     public void updatePublicationTest() {
         Publication publicationFromdb = new Publication(1, "Publication");
         Publication publication = new Publication("Publication(Updated)");
-        publicationFromdb = publicationService.updatePublication(publicationFromdb, publication);
+        when(publicationRepository.findById(any())).thenReturn(Optional.of(publicationFromdb));
+        publicationFromdb = publicationService.updatePublication(1, publication);
         assertThat(publicationFromdb.getId()).isEqualTo(1);
         assertThat(publicationFromdb.getName()).isEqualTo("Publication(Updated)");
+        verify(publicationRepository, times(1)).findById(anyInt());
     }
 
     @Test
     public void deletePublicationTest() {
-        publicationService.delete(new Publication());
+        when(publicationRepository.findById(any())).thenReturn(Optional.of(new Publication()));
+        publicationService.delete(anyInt());
         verify(publicationRepository).delete(any());
+        verify(publicationRepository, times(1)).findById(anyInt());
     }
 
 

@@ -48,8 +48,9 @@ public class PublicationControllerTest {
 
     @Test
     public void getPublicationByIdWhenExistTest() throws Exception {
-        when(publicationRepository.findById(any())).thenReturn(Optional.of(new Publication(1, "Publication1")));
-        mockMvc.perform(get("/publications/{id}",any())
+        when(publicationService.getPublicationById(anyInt()))
+                .thenReturn(new Publication(1, "Publication1"));
+        mockMvc.perform(get("/publications/{id}",anyInt())
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())

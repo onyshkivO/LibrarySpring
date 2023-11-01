@@ -17,8 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/publications")
@@ -40,8 +38,8 @@ public class PublicationController {
 
     @GetMapping("/{id}")
     @JsonView(Views.FullPublication.class)
-    public ResponseEntity<Publication> getPublicationById(@PathVariable("id") Publication publication) {
-        return new ResponseEntity<>(publication, HttpStatus.OK);
+    public ResponseEntity<Publication> getPublicationById(@PathVariable("id") Integer id) {
+        return new ResponseEntity<>(publicationService.getPublicationById(id), HttpStatus.OK);
     }
 
     @PostMapping()
@@ -57,20 +55,20 @@ public class PublicationController {
 
     @PutMapping("/{id}")
     @JsonView(Views.FullPublication.class)
-    public ResponseEntity<Publication> updatePublication(@PathVariable("id") Publication publicationFromDb,
+    public ResponseEntity<Publication> updatePublication(@PathVariable("id") Integer id,
                                                          @RequestBody @Valid Publication publication,
                                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new PublicationNotSavedException(bindingResult.getFieldErrors() + " bad name ");
 
-        Publication savedPublication = publicationService.updatePublication(publicationFromDb, publication);
+        Publication savedPublication = publicationService.updatePublication(id, publication);
 
         return new ResponseEntity<>(savedPublication, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public void deletePublication(@PathVariable("id") Publication publication) {
-        publicationService.delete(publication);
+    public void deletePublication(@PathVariable("id") int id) {
+        publicationService.delete(id);
     }
 
 

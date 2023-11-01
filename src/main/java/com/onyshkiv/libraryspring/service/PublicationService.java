@@ -42,13 +42,15 @@ public class PublicationService {
     }
 
     @Transactional
-    public Publication updatePublication(Publication publicationFromDb, Publication publication) {
+    public Publication updatePublication(int id, Publication publication) {
+        Publication publicationFromDb = getPublicationById(id);
         publicationFromDb.setName(publication.getName());
         return publicationFromDb;
     }
 
     @Transactional
-    public void delete(Publication publication) {
+    public void delete(int id) {
+        Publication publication = getPublicationById(id);
         publication.getBooks().forEach(book->book.setPublication(null));
         publicationRepository.delete(publication);
     }
