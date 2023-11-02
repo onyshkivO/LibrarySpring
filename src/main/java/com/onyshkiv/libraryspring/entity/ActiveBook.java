@@ -3,6 +3,7 @@ package com.onyshkiv.libraryspring.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -28,6 +29,7 @@ public class ActiveBook {
     @Enumerated(EnumType.STRING)
     @Column(name = "subscription_status",nullable = false)
     @JsonView(Views.IdName.class)
+    @NotNull
     private SubscriptionStatus subscriptionStatus;
 
     @Column(name = "start_date",nullable = false)
@@ -48,11 +50,13 @@ public class ActiveBook {
     @ManyToOne
     @JoinColumn(name = "user_login", referencedColumnName = "login",nullable = false)
     @JsonView(Views.FullActiveBook.class)
+    //@NotNull //todo попробувати з цим
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "book_isbn", referencedColumnName = "isbn",nullable = false)
     @JsonView(Views.IdName.class)
+   // @NotNull
     private Book book;
 
     public ActiveBook(int id) {

@@ -156,6 +156,7 @@ public class BookServiceTest {
 //        assertThat(bookFromDb.getPublication()).isEqualTo(new Publication(2, "Publication(new)"));
         assertThat(bookFromDb.getActiveBooks()).isEqualTo(Set.of(new ActiveBook(1), new ActiveBook(2)));
 //        verify(bookRepository).save(bookFromDb);
+        verify(bookRepository,times(1)).findById(anyString());
     }
 
     @Test

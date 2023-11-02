@@ -62,7 +62,6 @@ public class BookController {
     @JsonView(Views.FullBook.class)
     public ResponseEntity<DataPageDto<Book>> getBooksByName(@RequestParam(value = "name", required = false) String name, @PageableDefault Pageable pageable) {
         DataPageDto<Book> books = bookService.findBooksByName(name, pageable);
-        System.out.println(books.getData());
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 

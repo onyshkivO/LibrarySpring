@@ -39,8 +39,9 @@ public class ActiveBookServiceTest {
     @Autowired
     private ActiveBookService activeBookService;
 
+
     @Test
-    public void getActiveBookByIdWhenExistTest(){
+    public void getActiveBookByIdWhenExistTest() {
         ActiveBook activeBook = ActiveBook.builder()
                 .id(1)
                 .startDate(LocalDate.of(2021, 8, 12))
@@ -56,10 +57,11 @@ public class ActiveBookServiceTest {
         assertThat(activeBook.getEndDate()).isEqualTo(LocalDate.of(2021, 9, 12));
         assertThat(activeBook.getFine()).isEqualTo(100.00);
         assertThat(activeBook.getSubscriptionStatus()).isEqualTo(SubscriptionStatus.ACTIVE);
-        verify(activeBookRepository,times(1)).findById(anyInt());
+        verify(activeBookRepository, times(1)).findById(anyInt());
     }
+
     @Test
-    public void getActiveBookByIdWhenNotExistTest(){
+    public void getActiveBookByIdWhenNotExistTest() {
         when(activeBookRepository.findById(anyInt())).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> activeBookService.getActiveBookById(anyInt()))
@@ -67,7 +69,7 @@ public class ActiveBookServiceTest {
     }
 
     @Test
-    public void getActiveBooks(){
+    public void getActiveBooks() {
         ActiveBook activeBook1 = ActiveBook.builder()
                 .id(1)
                 .startDate(LocalDate.of(2021, 8, 12))
@@ -120,12 +122,12 @@ public class ActiveBookServiceTest {
         assertThat(activeBooks.get(2).getFine()).isEqualTo(300.00);
         assertThat(activeBooks.get(2).getSubscriptionStatus()).isEqualTo(SubscriptionStatus.FINED);
 
-        verify(activeBookRepository,times(1)).findAll(pageable);
+        verify(activeBookRepository, times(1)).findAll(pageable);
     }
 
 
     @Test
-    public void saveActiveBookWithNoIdTest(){
+    public void saveActiveBookWithNoIdTest() {
         Book book = Book.builder()
                 .isbn("123")
                 .name("Book")
@@ -148,14 +150,15 @@ public class ActiveBookServiceTest {
 
         activeBook = activeBookService.saveActiveBook(activeBook);
 
-        assertThat(activeBook.getStartDate()).isEqualTo(LocalDate.of(2023, 10, 27));
+        assertThat(activeBook.getStartDate()).isEqualTo(LocalDate.now());
         assertThat(activeBook.getSubscriptionStatus()).isEqualTo(SubscriptionStatus.WAITING);
         assertThat(activeBook.getUser()).isEqualTo(user);
         assertThat(activeBook.getBook()).isEqualTo(book);
         assertThat(book.getQuantity()).isEqualTo(11);
-        verify(bookService,times(1)).getBookByIsbn(anyString());
-        verify(activeBookRepository,times(1)).save(any());
+        verify(bookService, times(1)).getBookByIsbn(anyString());
+        verify(activeBookRepository, times(1)).save(any());
     }
+
     @Test
     public void createActiveBookWithIdTest() {
         ActiveBook activeBook = ActiveBook.builder()
@@ -167,7 +170,7 @@ public class ActiveBookServiceTest {
     }
 
     @Test
-    public void updateActiveBookTest(){
+    public void updateActiveBookTest() {
         ActiveBook activeBookFromDb = ActiveBook.builder()
                 .id(1)
                 .subscriptionStatus(SubscriptionStatus.WAITING)
@@ -178,15 +181,18 @@ public class ActiveBookServiceTest {
                 .endDate(LocalDate.of(2023, 11, 27))
                 .build();
 
-        activeBookFromDb = activeBookService.updateActiveBook(activeBookFromDb,activeBook);
+        when(activeBookRepository.findById(anyInt())).thenReturn(Optional.of(activeBookFromDb));
+        activeBookFromDb = activeBookService.updateActiveBook(anyInt(), activeBook);
 
         assertThat(activeBookFromDb.getId()).isEqualTo(1);
         assertThat(activeBookFromDb.getEndDate()).isEqualTo(LocalDate.of(2023, 11, 27));
         assertThat(activeBookFromDb.getSubscriptionStatus()).isEqualTo(SubscriptionStatus.ACTIVE);
         assertThat(activeBookFromDb.getFine()).isEqualTo(100.00);
+        verify(activeBookRepository, times(1)).findById(anyInt());
     }
+
     @Test
-    public void returnActiveBookTest(){
+    public void returnActiveBookTest() {
         Book book = Book.builder()
                 .isbn("123")
                 .name("Book")
@@ -204,18 +210,18 @@ public class ActiveBookServiceTest {
                 .book(book)
                 .subscriptionStatus(SubscriptionStatus.ACTIVE)
                 .build();
-        when(bookService.getBookByIsbn(anyString())).thenReturn(book);
+        when(activeBookRepository.findById(anyInt())).thenReturn(Optional.of(activeBook));
 
-        activeBookService.returnActiveBook(activeBook);
+        activeBook = activeBookService.returnActiveBook(anyInt());
         assertThat(activeBook.getSubscriptionStatus()).isEqualTo(SubscriptionStatus.RETURNED);
         assertThat(activeBook.getUser()).isEqualTo(user);
         assertThat(activeBook.getBook()).isEqualTo(book);
         assertThat(book.getQuantity()).isEqualTo(13);
-        verify(bookService,times(1)).getBookByIsbn(anyString());
+        verify(activeBookRepository,times(1)).findById(anyInt());
     }
 
     @Test
-    public void deleteActiveBookThatWasReturnedTest(){
+    public void deleteActiveBookThatWasReturnedTest() {
         Book book = Book.builder()
                 .isbn("123")
                 .name("Book")
@@ -233,15 +239,15 @@ public class ActiveBookServiceTest {
                 .book(book)
                 .subscriptionStatus(SubscriptionStatus.RETURNED)
                 .build();
-
+        when(activeBookRepository.findById(anyInt())).thenReturn(Optional.of(activeBook));
+        activeBookService.delete(anyInt());
         assertThat(book.getQuantity()).isEqualTo(12);
-        activeBookService.delete(activeBook);
-        verify(activeBookRepository,times(1)).delete(any());
+        verify(activeBookRepository, times(1)).delete(any());
         verifyNoInteractions(bookService);
     }
 
     @Test
-    public void deleteActiveBookThatWasNotReturnedTest(){
+    public void deleteActiveBookThatWasNotReturnedTest() {
         Book book = Book.builder()
                 .isbn("123")
                 .name("Book")
@@ -262,9 +268,9 @@ public class ActiveBookServiceTest {
                 .subscriptionStatus(SubscriptionStatus.ACTIVE)
                 .build();
 
-
-        activeBookService.delete(activeBook);
+        when(activeBookRepository.findById(anyInt())).thenReturn(Optional.of(activeBook));
+        activeBookService.delete(anyInt());
         assertThat(book.getQuantity()).isEqualTo(13);
-        verify(activeBookRepository,times(1)).delete(any());
+        verify(activeBookRepository, times(1)).delete(any());
     }
 }

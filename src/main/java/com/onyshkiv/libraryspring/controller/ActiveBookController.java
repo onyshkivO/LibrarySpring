@@ -45,17 +45,18 @@ public class ActiveBookController {
 
     @GetMapping("/{id}")
     @JsonView(Views.FullActiveBook.class)
-    public ResponseEntity<ActiveBook> getActiveBookById(@PathVariable("id") ActiveBook activeBook) {
+    public ResponseEntity<ActiveBook> getActiveBookById(@PathVariable("id") int id) {
+        ActiveBook activeBook = activeBookService.getActiveBookById(id);
         return new ResponseEntity<>(activeBook, HttpStatus.OK);
     }
 
     @GetMapping("/user/{login}")
     @JsonView(Views.FullActiveBook.class)
-    public ResponseEntity<Set<ActiveBook>> getActiveBooksByUserLogin(
-            @PathVariable("login") User user,
+    public ResponseEntity<DataPageDto<ActiveBook>> getActiveBooksByUserLogin(
+            @PathVariable("login") String login,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-//        Page<ActiveBook> activeBooks = activeBookService.getActiveBooksByUserLogin(login, pageable);
-        return new ResponseEntity<>(user.getActiveBooks(), HttpStatus.OK);
+        DataPageDto<ActiveBook> activeBooks = activeBookService.getActiveBooksByUserLogin(login, pageable);
+        return new ResponseEntity<>(activeBooks, HttpStatus.OK);
     }
 
     @PostMapping()
@@ -71,27 +72,27 @@ public class ActiveBookController {
 
     @PutMapping("/{id}")
     @JsonView(Views.FullActiveBook.class)
-    public ResponseEntity<ActiveBook> updateActiveBook(@PathVariable("id") ActiveBook activeBookFromDb,
+    public ResponseEntity<ActiveBook> updateActiveBook(@PathVariable("id") int id,
                                                        @RequestBody @Valid ActiveBook activeBook,
                                                        BindingResult bindingResult) {
         if (bindingResult.hasErrors())
             throw new ActiveBookNotSavedException(bindingResult.getFieldErrors().toString());
 
-        ActiveBook updatedActiveBook = activeBookService.updateActiveBook(activeBookFromDb, activeBook);
+        ActiveBook updatedActiveBook = activeBookService.updateActiveBook(id, activeBook);
         return new ResponseEntity<>(updatedActiveBook, HttpStatus.OK);
     }
 
     @PutMapping("/return/{id}")
     @JsonView(Views.FullActiveBook.class)
-    public ResponseEntity<ActiveBook> returnActiveBook(@PathVariable("id") ActiveBook activeBook) {
-        ActiveBook updatedActiveBook = activeBookService.returnActiveBook(activeBook);
+    public ResponseEntity<ActiveBook> returnActiveBook(@PathVariable("id") int id) {
+        ActiveBook updatedActiveBook = activeBookService.returnActiveBook(id);
         return new ResponseEntity<>(updatedActiveBook, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @JsonView(Views.IdName.class)
-    public void deleteActiveBookById(@PathVariable("id") ActiveBook activeBook) {
-        activeBookService.delete(activeBook);
+    public void deleteActiveBookById(@PathVariable("id") int id) {
+        activeBookService.delete(id);
     }
 
 
