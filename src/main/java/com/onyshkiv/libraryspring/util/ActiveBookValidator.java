@@ -34,7 +34,7 @@ public class ActiveBookValidator implements Validator {
         try {
             Book book = bookService.getBookByIsbn(bookIsbn);
             if (book.getQuantity() < 1)
-                errors.rejectValue("isbnOrQuantity", "", "There are not available book with isbn " + bookIsbn);
+                errors.rejectValue("book", "", "There are not available book with isbn " + bookIsbn);
         } catch (BookNotFoundException ignored) {
         }
     }

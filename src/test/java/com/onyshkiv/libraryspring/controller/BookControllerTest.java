@@ -2,11 +2,10 @@ package com.onyshkiv.libraryspring.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onyshkiv.libraryspring.dto.DataPageDto;
-import com.onyshkiv.libraryspring.entity.ActiveBook;
-import com.onyshkiv.libraryspring.entity.Author;
-import com.onyshkiv.libraryspring.entity.Book;
-import com.onyshkiv.libraryspring.entity.Publication;
+import com.onyshkiv.libraryspring.entity.*;
+import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.exception.book.BookNotSavedException;
+import com.onyshkiv.libraryspring.exception.user.UserNotSavedException;
 import com.onyshkiv.libraryspring.service.BookService;
 import com.onyshkiv.libraryspring.util.BookValidator;
 import org.junit.jupiter.api.Assertions;
@@ -17,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.validation.Errors;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -138,7 +138,7 @@ public class BookControllerTest {
     }
 
 
-    //todo ще додати коли валідатор використовуєтсья
+
     @Test
     public void createBookWithErrorsTest() throws Exception {
         Book book = Book.builder()
@@ -161,6 +161,33 @@ public class BookControllerTest {
         verifyNoInteractions(bookService);
     }
 
+    @Test
+    public void saveBookWithErrorsByUserValidatorTest() throws Exception {
+        Book book = Book.builder()
+                .isbn("1231231231")
+                .name("Book1")
+                .quantity(12)
+                .details("some info")
+                .publication(new Publication(1, "Publication"))
+                .authors(Set.of(new Author(1, "author")))
+                .activeBooks(Set.of(new ActiveBook(1), new ActiveBook(2)))
+                .build();
+        String bookJson = objectMapper.writeValueAsString(book);
+        doAnswer(invocation -> {
+            Errors errors = invocation.getArgument(1);
+            errors.rejectValue("isbn", "", "Book with isbn " + book.getIsbn() + " already exist");
+            return null;
+        }).when(bookValidator).validate(any(), any());
+        mockMvc.perform(post("/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookJson)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof BookNotSavedException))
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException().getMessage().contains("Book with isbn " + book.getIsbn() + " already exist") ));
+        verifyNoInteractions(bookService);
+        verify(bookValidator,times(1)).validate(any(),any());
+    }
     @Test
     public void updateBookTest() throws Exception {
         Book book = Book.builder()

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.*;
 import com.onyshkiv.libraryspring.exception.activeBook.ActiveBookNotSavedException;
+import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.exception.book.BookNotSavedException;
 import com.onyshkiv.libraryspring.service.ActiveBookService;
 import com.onyshkiv.libraryspring.util.ActiveBookValidator;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.validation.Errors;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -162,7 +164,7 @@ public class ActiveBookControllerTest {
         verify(activeBookService, times(1)).saveActiveBook(any());
     }
 
-    //todo ще додати коли валідатор використовуєтсья
+
     @Test
     public void createActiveBookWithErrorsTest() throws Exception {
         ActiveBook activeBook = ActiveBook.builder()
@@ -177,6 +179,44 @@ public class ActiveBookControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof ActiveBookNotSavedException));
         verifyNoInteractions(activeBookService);
+    }
+
+    @Test
+    public void saveActiveBookWithErrorsByUserValidatorTest() throws Exception {
+        Book book = Book.builder()
+                .isbn("123")
+                .name("Book")
+                .quantity(0)
+                .details("some info")
+                .publication(new Publication(1, "Publication")).build();
+        User user = User.builder()
+                .login("user")
+                .email("user@gmail.com")
+                .password("123")
+                .build();
+        ActiveBook activeBook = ActiveBook.builder()
+                .id(1)
+                .user(user)
+                .book(book)
+                .fine(100.00)
+                .subscriptionStatus(SubscriptionStatus.ACTIVE)
+                .build();
+        String activeBookJson = objectMapper.writeValueAsString(activeBook);
+        doAnswer(invocation -> {
+            Errors errors = invocation.getArgument(1);
+            errors.rejectValue("book", "", "There are not available book with isbn " + book.getIsbn());
+
+            return null;
+        }).when(activeBookValidator).validate(any(), any());
+        mockMvc.perform(post("/activeBooks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(activeBookJson)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof ActiveBookNotSavedException))
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException().getMessage().contains("There are not available book with isbn " + book.getIsbn()) ));
+        verifyNoInteractions(activeBookService);
+        verify(activeBookValidator,times(1)).validate(any(),any());
     }
     @Test
     public void updateActiveBookTest() throws Exception {

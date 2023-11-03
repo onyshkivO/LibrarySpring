@@ -11,17 +11,23 @@ import com.onyshkiv.libraryspring.service.UserService;
 import com.onyshkiv.libraryspring.util.UserValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -143,6 +149,35 @@ public class UserControllerTest {
     }
 
     @Test
+    public void saveUserWithErrorsByUserValidatorTest() throws Exception {
+        User user = User.builder()
+                .login("user")
+                .email("user@gmail.com")
+                .firstName("fname")
+                .lastName("lname")
+                .phone("0981111111")
+                .password("1234567")
+                .build();
+        String userJson = objectMapper.writeValueAsString(user);
+        doAnswer(invocation -> {
+            Errors arg1 = invocation.getArgument(1);
+            arg1.rejectValue("login", "", "User login already exist");
+            return null;
+        }).when(userValidator).validate(any(), any());
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(userJson)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof UserNotSavedException))
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException().getMessage().contains("User login already exist") ));
+        verifyNoInteractions(userService);
+        verify(userValidator,times(1)).validate(any(),any());
+
+
+    }
+
+    @Test
     public void updateUserTest() throws Exception {
         User user = User.builder()
                 .login("user")
@@ -170,13 +205,15 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.password").doesNotExist());
         verify(userService, times(1)).updateUser(anyString(), any());
     }
+
     @Test
     public void deleteUserTest() throws Exception {
         mockMvc.perform(delete("/users/{login}", "user")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-        verify(userService,times(1)).delete(anyString());
+        verify(userService, times(1)).delete(anyString());
     }
+
     @Test
     public void changeUserStatusTest() throws Exception {
         User user = User.builder()
@@ -199,7 +236,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.phone").value("0981111111"))
                 .andExpect(jsonPath("$.password").doesNotExist());
 
-        verify(userService,times(1)).changeUserStatus(anyString());
+        verify(userService, times(1)).changeUserStatus(anyString());
     }
 
 }
