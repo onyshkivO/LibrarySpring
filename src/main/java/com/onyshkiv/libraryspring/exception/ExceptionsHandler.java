@@ -26,5 +26,4 @@ public class ExceptionsHandler {
         ErrorResponse personErrorResponse = new ErrorResponse(exception.getMessage(), LocalDateTime.now());
         return new ResponseEntity<>(personErrorResponse, HttpStatus.BAD_REQUEST);
     }
-
 }
