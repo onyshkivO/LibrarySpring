@@ -6,91 +6,106 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-    private final String secret_key = "javainuse-secret-key";
+    @Value("${secret_key}")
+    private String secret_key ;
     private long accessTokenValidity = 60 * 60 * 1000;
 
-    private final JwtParser jwtParser;
 
-    private final String TOKEN_HEADER = "Authorization";
-    private final String TOKEN_PREFIX = "Bearer ";
 
-    public JwtUtil() {
-        this.jwtParser = Jwts.parser().verifyWith(getSecretKey()).build();
+
+    public String extractUsername(String token) {
+//        return extractClaim(token,Claims::getSubject); або так
+        return extractAllClaims(token).getSubject();// бо запихаю в сабджект юсернейм
     }
 
-    private SecretKey getSecretKey() {
 
-        byte[] bytes = Decoders.BASE64.decode(secret_key);
-        return Keys.hmacShaKeyFor(bytes);
+    //todo що за магія
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
     }
 
-    public String createToken(User user) {
-        Claims claims = Jwts.claims().subject(user.getLogin()).build();
-        claims.put("firstName", user.getFirstName());
-        claims.put("lastName", user.getLastName());
-        claims.put("email", user.getEmail());
-        claims.put("phone", user.getPhone());
-        Date tokenCreateTime = new Date();
-        Date tokenValidity = new Date(tokenCreateTime.getTime() + TimeUnit.MINUTES.toMillis(accessTokenValidity));
-        return Jwts.builder()
-                .claims(claims)
-                .expiration(tokenValidity)
+
+    public String generateToken(UserDetails userDetails) {
+        return generateToken(new HashMap<>(), userDetails);
+    }
+
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return Jwts
+                .builder()
+                .claims(extraClaims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + accessTokenValidity))
                 .signWith(getSecretKey())
                 .compact();
     }
 
-    private Claims parseJwtClaims(String token) {
-        return jwtParser.parseSignedClaims(token).getPayload();
+    private Claims extractAllClaims(String token) {
+        return Jwts
+                .parser()
+                .verifyWith(getSecretKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
-    public Claims resolveClaims(HttpServletRequest req) {
+    public boolean validateJwtToken(String authToken) {
         try {
-            String token = resolveToken(req);
-            if (token != null) {
-                return parseJwtClaims(token);
-            }
-            return null;
-        } catch (ExpiredJwtException ex) {
-            req.setAttribute("expired", ex.getMessage());
-            throw ex;
-        } catch (Exception ex) {
-            req.setAttribute("invalid", ex.getMessage());
-            throw ex;
+            Jwts.parser().verifyWith(getSecretKey()).build().parseSignedClaims(authToken);
+            return true;
+        } catch (SignatureException e) {
+            System.out.printf("Invalid JWT signature: {%s}\n", e.getMessage());
+        } catch (MalformedJwtException e) {
+            System.out.printf("Invalid JWT token: {%s}\n", e.getMessage());
+        } catch (ExpiredJwtException e) {
+            System.out.printf("JWT token is expired: {%s}\n", e.getMessage());
+        } catch (UnsupportedJwtException e) {
+            System.out.printf("JWT token is unsupported: {%s}\n", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            System.out.printf("JWT claims string is empty: {%s}\n", e.getMessage());
         }
+        System.out.println("--------------------");
+        System.out.println("--------------------");
+        System.out.println("--------------------");
+        System.out.println("--------------------");
+        System.out.println("--------------------");
+        return false;
+    }
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
-    public String resolveToken(HttpServletRequest request) {
-
-        String bearerToken = request.getHeader(TOKEN_HEADER);
-        if (bearerToken != null && bearerToken.startsWith(TOKEN_PREFIX)) {
-            return bearerToken.substring(TOKEN_PREFIX.length());
-        }
-        return null;
+    private boolean isTokenExpired(String token) {
+        //extractExpiration можна так
+        return extractAllClaims(token).getExpiration().before(new Date());
     }
 
-    public boolean validateClaims(Claims claims) throws AuthenticationException {
-        try {
-            return claims.getExpiration().after(new Date());
-        } catch (Exception e) {
-            throw e;
-        }
+    private Date extractExpiration(String token){
+        return extractClaim(token,Claims::getExpiration);
     }
 
-    public String getLogin(Claims claims) {
-        return claims.getSubject();
+    private SecretKey getSecretKey() {
+        byte[] bytes = Decoders.BASE64.decode(secret_key);
+        return Keys.hmacShaKeyFor(bytes);
     }
-//todo
-    private Role getRoles(Claims claims) {
-        return (Role) claims.get("roles");
-    }
+
+
 
 }

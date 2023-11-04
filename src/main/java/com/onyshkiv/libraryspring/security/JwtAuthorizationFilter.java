@@ -1,71 +1,71 @@
 package com.onyshkiv.libraryspring.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onyshkiv.libraryspring.exception.JwtException;
 import com.onyshkiv.libraryspring.service.MyUserDetailsService;
 import com.onyshkiv.libraryspring.util.JwtUtil;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final ObjectMapper mapper;
     private final MyUserDetailsService userDetailsService;
+    private final String TOKEN_HEADER = "Authorization";
+    private final String TOKEN_PREFIX = "Bearer ";
 
     @Autowired
-    public JwtAuthorizationFilter(JwtUtil jwtUtil, ObjectMapper mapper, MyUserDetailsService userDetailsService) {
+    public JwtAuthorizationFilter(JwtUtil jwtUtil, MyUserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
-        this.mapper = mapper;
         this.userDetailsService = userDetailsService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        Map<String, Object> errorDetails = new HashMap<>();
-
         try {
-            String accessToken = jwtUtil.resolveToken(request);
-            if (accessToken == null ) {
-                filterChain.doFilter(request, response);
-                return;
+            String jwtToken = parseJwt(request);
+            if (jwtToken != null) {
+                String userLogin = jwtUtil.extractUsername(jwtToken);
+                if (userLogin != null && SecurityContextHolder.getContext().getAuthentication() == null) { //SecurityContextHolder.getContext().getAuthentication() == null значть користувач не залогінений
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(userLogin);
+                    if (jwtUtil.isTokenValid(jwtToken, userDetails)) {
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(
+                                        userDetails,
+                                        userDetails.getPassword(),
+                                        userDetails.getAuthorities()
+                                );
+                        authToken.setDetails(
+                                new WebAuthenticationDetailsSource().buildDetails(request)
+                        );
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
+
+                }
             }
-            System.out.println("token : "+accessToken);
-            Claims claims = jwtUtil.resolveClaims(request);
-
-            if(claims != null & jwtUtil.validateClaims(claims)){
-                String login = claims.getSubject();
-                UserDetails userDetails = userDetailsService.loadUserByUsername(login);
-                Authentication authentication =
-                        new UsernamePasswordAuthenticationToken(login,"",userDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-
-        }catch (Exception e){
-            errorDetails.put("message", "Authentication Error");
-            errorDetails.put("details",e.getMessage());
-            response.setStatus(HttpStatus.FORBIDDEN.value());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-
-            mapper.writeValue(response.getWriter(), errorDetails);
-
+        } catch (Exception e) {
+            throw new JwtException(e.getMessage());
         }
         filterChain.doFilter(request, response);
+    }
+
+    private String parseJwt(HttpServletRequest request) {
+        String headerAuth = request.getHeader(TOKEN_HEADER);
+        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith(TOKEN_PREFIX)) {
+            return headerAuth.substring(TOKEN_PREFIX.length());
+        }
+        return null;
     }
 }
