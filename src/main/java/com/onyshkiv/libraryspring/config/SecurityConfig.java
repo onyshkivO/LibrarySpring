@@ -63,6 +63,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/books").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/authors").hasRole("ADMINISTRATOR")
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/activeBooks/return/{id}", "/activeBooks/{id}"
                                 , "/authors/{id}", "/books/{isbn}", "/publications/{id}", "/users/{login}", "/users/status/{login}").hasAnyRole("LIBRARIAN", "ADMINISTRATOR")

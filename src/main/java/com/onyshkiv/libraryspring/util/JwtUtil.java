@@ -2,6 +2,7 @@ package com.onyshkiv.libraryspring.util;
 
 import com.onyshkiv.libraryspring.entity.Role;
 import com.onyshkiv.libraryspring.entity.User;
+import com.onyshkiv.libraryspring.security.MyUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;

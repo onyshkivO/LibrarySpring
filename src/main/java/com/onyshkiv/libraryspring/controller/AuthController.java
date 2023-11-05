@@ -42,6 +42,7 @@ public class AuthController {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getLogin(), req.getPassword()));
             UserDetails userDetails = userDetailsService.loadUserByUsername(req.getLogin());
+
             String token = jwtUtil.generateToken(userDetails);
             AuthenticationResponseDto loginRes = new AuthenticationResponseDto(token);
 
