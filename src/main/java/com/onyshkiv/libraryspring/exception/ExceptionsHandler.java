@@ -26,4 +26,13 @@ public class ExceptionsHandler {
         ErrorResponse personErrorResponse = new ErrorResponse(exception.getMessage(), LocalDateTime.now());
         return new ResponseEntity<>(personErrorResponse, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException(JwtException exception) {
+        System.out.println("-0000000000000000000000000");
+        System.out.println("-0000000000000000000000000");
+        System.out.println("-0000000000000000000000000");
+        System.out.println("-0000000000000000000000000");
+        ErrorResponse personErrorResponse = new ErrorResponse(exception.getMessage(), LocalDateTime.now());
+        return new ResponseEntity<>(personErrorResponse, HttpStatus.BAD_REQUEST);
+    }
 }

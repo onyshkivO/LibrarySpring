@@ -5,9 +5,11 @@ import com.onyshkiv.libraryspring.service.MyUserDetailsService;
 import com.onyshkiv.libraryspring.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,6 +17,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
@@ -36,11 +39,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             String jwtToken = parseJwt(request);
-            if (jwtToken != null) {
+            if (jwtToken != null&& jwtUtil.validateJwtToken(jwtToken)) {
                 String userLogin = jwtUtil.extractUsername(jwtToken);
                 if (userLogin != null && SecurityContextHolder.getContext().getAuthentication() == null) { //SecurityContextHolder.getContext().getAuthentication() == null значть користувач не залогінений
                     UserDetails userDetails = userDetailsService.loadUserByUsername(userLogin);
-                    if (jwtUtil.isTokenValid(jwtToken, userDetails)) {
+                    if (jwtUtil.isValidUser(jwtToken, userDetails)) {
                         UsernamePasswordAuthenticationToken authToken =
                                 new UsernamePasswordAuthenticationToken(
                                         userDetails,
@@ -56,7 +59,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            throw new JwtException(e.getMessage());
+
+            System.out.println(e.getMessage());
+            //throw new JwtException(e.getMessage());
         }
         filterChain.doFilter(request, response);
     }

@@ -44,6 +44,7 @@ public class AuthController {
             UserDetails userDetails = userDetailsService.loadUserByUsername(req.getLogin());
             String token = jwtUtil.generateToken(userDetails);
             AuthenticationResponseDto loginRes = new AuthenticationResponseDto(token);
+
             return ResponseEntity.ok(loginRes);
         } catch (BadCredentialsException e) {
             throw new JwtException("Invalid username or password");
