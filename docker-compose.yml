@@ -6,13 +6,12 @@ services:
     restart: unless-stopped
     env_file: ./.env
     environment:
-      - MYSQL_USER=$MYSQL_USER
-      - MYSQL_PASSWORD=$MYSQL_PASSWORD
-      - MYSQL_DATABASE=$MYSQL_DATABASE
+      MYSQL_ROOT_PASSWORD: $MYSQL_ROOT_PASSWORD
+      MYSQL_DATABASE: library2
+      MYSQL_USER: spring_learning
+      MYSQL_PASSWORD: pass
     ports:
-      - $MYSQL_LOCAL_PORT:$MYSQL_DOCKER_PORT
-    volumes:
-      - db:/var/lib/mysql
+      - '3307:3306'
   app:
     depends_on:
       - mysqldb
@@ -20,15 +19,8 @@ services:
     restart: on-failure
     env_file: ./.env
     ports:
-      - $SPRING_LOCAL_PORT:$SPRING_DOCKER_PORT
+      - '8686:8080'
     environment:
-      MYSQL_USER: $MYSQL_USER
-      MYSQL_PASSWORD: $MYSQL_PASSWORD
-      MYSQL_DATABASE: $MYSQL_DATABASE
-    volumes:
-      - .m2:/root/.m2
-    stdin_open: true
-    tty: true
-
-volumes:
-  db:
+      MYSQL_HOST: mysqldb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onyshkiv.libraryspring.dto.DataPageDto;
 import com.onyshkiv.libraryspring.entity.Author;
 import com.onyshkiv.libraryspring.service.AuthorService;
+import com.onyshkiv.libraryspring.service.MyUserDetailsService;
+import com.onyshkiv.libraryspring.util.JwtUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -29,6 +31,10 @@ public class AuthorControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private AuthorService authorService;
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private MyUserDetailsService myUserDetailsService;
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Test

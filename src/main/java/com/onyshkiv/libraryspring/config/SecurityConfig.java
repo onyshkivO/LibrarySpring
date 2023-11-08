@@ -54,7 +54,6 @@ public class SecurityConfig {
 //                .build();
 //    }
 
-    //todo додати ролі
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 

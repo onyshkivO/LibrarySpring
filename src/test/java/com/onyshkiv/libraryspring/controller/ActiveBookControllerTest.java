@@ -7,7 +7,9 @@ import com.onyshkiv.libraryspring.exception.activeBook.ActiveBookNotSavedExcepti
 import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.exception.book.BookNotSavedException;
 import com.onyshkiv.libraryspring.service.ActiveBookService;
+import com.onyshkiv.libraryspring.service.MyUserDetailsService;
 import com.onyshkiv.libraryspring.util.ActiveBookValidator;
+import com.onyshkiv.libraryspring.util.JwtUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.validation.Errors;
 
@@ -30,6 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ActiveBookController.class)
 @AutoConfigureMockMvc(addFilters = false)
+
 public class ActiveBookControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -37,6 +42,10 @@ public class ActiveBookControllerTest {
     private ActiveBookService activeBookService;
     @MockBean
     private ActiveBookValidator activeBookValidator;
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private MyUserDetailsService myUserDetailsService;
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
@@ -214,10 +223,11 @@ public class ActiveBookControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof ActiveBookNotSavedException))
-                .andExpect(result -> Assertions.assertTrue(result.getResolvedException().getMessage().contains("There are not available book with isbn " + book.getIsbn()) ));
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException().getMessage().contains("There are not available book with isbn " + book.getIsbn())));
         verifyNoInteractions(activeBookService);
-        verify(activeBookValidator,times(1)).validate(any(),any());
+        verify(activeBookValidator, times(1)).validate(any(), any());
     }
+
     @Test
     public void updateActiveBookTest() throws Exception {
         Book book = Book.builder()
@@ -296,8 +306,7 @@ public class ActiveBookControllerTest {
     }
 
 
-
-   @Test
+    @Test
     public void deleteActiveBookTest() throws Exception {
         mockMvc.perform(delete("/activeBooks/{id}", anyInt())
                         .accept(MediaType.APPLICATION_JSON))

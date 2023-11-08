@@ -7,7 +7,9 @@ import com.onyshkiv.libraryspring.entity.Author;
 import com.onyshkiv.libraryspring.entity.Publication;
 import com.onyshkiv.libraryspring.entity.User;
 import com.onyshkiv.libraryspring.exception.user.UserNotSavedException;
+import com.onyshkiv.libraryspring.service.MyUserDetailsService;
 import com.onyshkiv.libraryspring.service.UserService;
+import com.onyshkiv.libraryspring.util.JwtUtil;
 import com.onyshkiv.libraryspring.util.UserValidator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -44,6 +46,10 @@ public class UserControllerTest {
     private UserService userService;
     @MockBean
     private UserValidator userValidator;
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private MyUserDetailsService myUserDetailsService;
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Test

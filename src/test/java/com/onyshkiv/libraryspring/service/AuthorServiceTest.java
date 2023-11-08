@@ -6,6 +6,7 @@ import com.onyshkiv.libraryspring.entity.Publication;
 import com.onyshkiv.libraryspring.exception.author.AuthorNotFoundException;
 import com.onyshkiv.libraryspring.exception.author.AuthorNotSavedException;
 import com.onyshkiv.libraryspring.repository.AuthorRepository;
+import com.onyshkiv.libraryspring.util.JwtUtil;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,10 @@ import static org.mockito.Mockito.*;
 public class AuthorServiceTest {
     @MockBean
     private AuthorRepository authorRepository;
-
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private MyUserDetailsService myUserDetailsService;
     @InjectMocks
     @Autowired
     private AuthorService authorService;

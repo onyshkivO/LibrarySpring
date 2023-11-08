@@ -7,7 +7,9 @@ import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.exception.book.BookNotSavedException;
 import com.onyshkiv.libraryspring.exception.user.UserNotSavedException;
 import com.onyshkiv.libraryspring.service.BookService;
+import com.onyshkiv.libraryspring.service.MyUserDetailsService;
 import com.onyshkiv.libraryspring.util.BookValidator;
+import com.onyshkiv.libraryspring.util.JwtUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +41,10 @@ public class BookControllerTest {
 
     @MockBean
     private BookValidator bookValidator;
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private MyUserDetailsService myUserDetailsService;
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Test

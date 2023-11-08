@@ -6,6 +6,7 @@ import com.onyshkiv.libraryspring.entity.User;
 import com.onyshkiv.libraryspring.entity.UserStatus;
 import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
 import com.onyshkiv.libraryspring.repository.UserRepository;
+import com.onyshkiv.libraryspring.util.JwtUtil;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,10 @@ public class UserServiceTest {
     private UserRepository userRepository;
     @MockBean
     private PasswordEncoder passwordEncoder;
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private MyUserDetailsService myUserDetailsService;
     @InjectMocks
     @Autowired
     private UserService userService;

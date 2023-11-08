@@ -7,6 +7,7 @@ import com.onyshkiv.libraryspring.exception.activeBook.ActiveBookNotSavedExcepti
 import com.onyshkiv.libraryspring.exception.author.AuthorNotSavedException;
 import com.onyshkiv.libraryspring.exception.publication.PublicationNotFoundException;
 import com.onyshkiv.libraryspring.repository.ActiveBookRepository;
+import com.onyshkiv.libraryspring.util.JwtUtil;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,10 @@ public class ActiveBookServiceTest {
     private ActiveBookRepository activeBookRepository;
     @MockBean
     private BookService bookService;
-
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private MyUserDetailsService myUserDetailsService;
     @InjectMocks
     @Autowired
     private ActiveBookService activeBookService;

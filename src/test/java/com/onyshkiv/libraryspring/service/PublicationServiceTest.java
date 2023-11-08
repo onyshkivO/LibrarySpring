@@ -5,6 +5,7 @@ import com.onyshkiv.libraryspring.entity.Publication;
 import com.onyshkiv.libraryspring.exception.publication.PublicationNotFoundException;
 import com.onyshkiv.libraryspring.exception.publication.PublicationNotSavedException;
 import com.onyshkiv.libraryspring.repository.PublicationRepository;
+import com.onyshkiv.libraryspring.util.JwtUtil;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,10 @@ public class PublicationServiceTest {
 
     @MockBean
     private PublicationRepository publicationRepository;
-
+    @MockBean
+    private JwtUtil jwtUtil;
+    @MockBean
+    private MyUserDetailsService myUserDetailsService;
     @InjectMocks
     @Autowired
     private PublicationService publicationService;
