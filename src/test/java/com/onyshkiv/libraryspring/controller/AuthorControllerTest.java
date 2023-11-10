@@ -40,7 +40,7 @@ public class AuthorControllerTest {
     @Test
     public void getAuthorByIdWhenExistTest() throws Exception {
         when(authorService.getAuthorById(anyInt()))
-                .thenReturn(new Author(1, "Author1(bad for test fails)"));
+                .thenReturn(new Author(1, "Author1"));
 
         mockMvc.perform(get("/authors/{id}", anyInt())
                         .accept(MediaType.APPLICATION_JSON))
