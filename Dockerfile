@@ -1,11 +1,8 @@
 FROM maven:3.8.5-openjdk-17
 
 WORKDIR /library-app
-COPY .mvn/ .mvn
-COPY mvnw pom.xml ./
+COPY . .
 RUN sed -i 's/\r$//' mvnw
-RUN ./mvnw dependency:resolve
+RUN mvn clean install
 
-COPY src ./src
-
-CMD ["./mvnw", "spring-boot:run"]
+CMD mvn spring-boot:run
