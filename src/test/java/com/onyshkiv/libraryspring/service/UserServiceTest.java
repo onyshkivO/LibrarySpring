@@ -94,7 +94,7 @@ public class UserServiceTest {
 
         DataPageDto<User> userPageResult = userService.getAllUsers(pageable);
         List<User> users = userPageResult.getData();
-        assertThat(users.get(0).getLogin()).isEqualTo("user2");
+        assertThat(users.get(0).getLogin()).isEqualTo("user1");
         assertThat(users.get(0).getEmail()).isEqualTo("user1@gmail.com");
         assertThat(users.get(0).getPassword()).isEqualTo("111");
         assertThat(users.get(1).getLogin()).isEqualTo("user2");
