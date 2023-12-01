@@ -10,9 +10,9 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "rework-docker" ]
+    branches: [ "rework-docker","rework-with-jwt-and-aws" ]
   pull_request:
-    branches: [ "rework-docker" ]
+    branches: [ "rework-docker","rework-with-jwt-and-aws" ]
 
 jobs:
   build:
