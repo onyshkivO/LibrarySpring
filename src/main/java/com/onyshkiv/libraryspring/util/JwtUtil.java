@@ -1,29 +1,26 @@
 package com.onyshkiv.libraryspring.util;
 
-import com.onyshkiv.libraryspring.entity.Role;
-import com.onyshkiv.libraryspring.entity.User;
-import com.onyshkiv.libraryspring.security.MyUserDetails;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
     @Value("${secret_key}")
     private String secret_key;
+    @Value("${token.access.expiration}")
+    private long accessTokenExpiration;
+    @Value("${token.refresh.expiration}")
+    private long refreshTokenExpiration;
     private long accessTokenValidity = 60 * 60 * 1000;
 
 
@@ -45,12 +42,20 @@ public class JwtUtil {
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return buildToken(extraClaims, userDetails, accessTokenExpiration);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, refreshTokenExpiration);
+    }
+
+    private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
         return Jwts
                 .builder()
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + accessTokenValidity))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSecretKey())
                 .compact();
     }
