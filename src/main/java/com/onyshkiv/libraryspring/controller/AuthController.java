@@ -51,7 +51,6 @@ public class AuthController {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getLogin(), req.getPassword()));
             MyUserDetails userDetails = (MyUserDetails) userDetailsService.loadUserByUsername(req.getLogin());
-
 //            Map<String, Object> claims = Map.of("role",userDetails.getUser().getRole());
             Map<String, Object> claims = Map.of("user",userDetails.getUser());
             String token = jwtUtil.generateToken(claims,userDetails);

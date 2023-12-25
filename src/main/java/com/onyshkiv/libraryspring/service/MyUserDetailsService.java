@@ -23,10 +23,10 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-
-        //todo чому при будь-якому запиті це перевіряється і запрошується до бд(иоже так і має бути)
-        return new MyUserDetails(userRepository.getUserByLogin(login)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found")));
+        User user = userRepository.getUserByLogin(login)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        user.setPassword("");
+        return new MyUserDetails(user);
 
     }
 }
