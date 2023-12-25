@@ -1,5 +1,6 @@
 package com.onyshkiv.libraryspring.util;
 
+import com.onyshkiv.libraryspring.entity.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -37,6 +38,7 @@ public class JwtUtil {
     }
 
 
+
     public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
@@ -60,7 +62,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts
                 .parser()
                 .verifyWith(getSecretKey())
@@ -106,12 +108,13 @@ public class JwtUtil {
 //
 //    }
 
-    public boolean isValidUser(String token, UserDetails userDetails) {
+    public boolean isValidUser(String token, String username) {
         validateJwtToken(token);// todo хз чи це тут треба
-        String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()));
+        String usernameFromToken = extractUsername(token);
+        return (usernameFromToken.equals(username));
 
     }
+
 
     private boolean isTokenExpired(String token) {
         if (extractAllClaims(token).getExpiration().before(new Date())) {

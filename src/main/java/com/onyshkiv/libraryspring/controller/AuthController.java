@@ -18,14 +18,15 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -49,9 +50,11 @@ public class AuthController {
     public ResponseEntity<AuthenticationResponseDto> login(@RequestBody AuthenticationRequestDto req) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getLogin(), req.getPassword()));
-            UserDetails userDetails = userDetailsService.loadUserByUsername(req.getLogin());
+            MyUserDetails userDetails = (MyUserDetails) userDetailsService.loadUserByUsername(req.getLogin());
 
-            String token = jwtUtil.generateToken(userDetails);
+//            Map<String, Object> claims = Map.of("role",userDetails.getUser().getRole());
+            Map<String, Object> claims = Map.of("user",userDetails.getUser());
+            String token = jwtUtil.generateToken(claims,userDetails);
             String refreshToken = jwtUtil.generateRefreshToken(userDetails);
             AuthenticationResponseDto loginRes = new AuthenticationResponseDto(token, refreshToken);
 
@@ -63,15 +66,25 @@ public class AuthController {
         }
     }
 
+
+
+    @GetMapping("/claims")
+    public Object getClaims(Authentication authentication, @AuthenticationPrincipal MyUserDetails userDetails){
+        SecurityContext context = SecurityContextHolder.getContext();
+        return userDetails;
+
+    }
+
     @PostMapping(value = "/refresh-token")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+
         try {
             String refreshToken = parseJwt(request);
             if (refreshToken != null && jwtUtil.validateJwtToken(refreshToken)) {
                 String userLogin = jwtUtil.extractUsername(refreshToken);
                 if (userLogin != null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(userLogin);
-                    if (jwtUtil.isValidUser(refreshToken, userDetails)) {
+                    if (jwtUtil.isValidUser(refreshToken, userDetails.getUsername())) {
                         String accesToken = jwtUtil.generateToken(userDetails);
                         AuthenticationResponseDto authResponse =
                                 new AuthenticationResponseDto(accesToken, refreshToken);
@@ -92,4 +105,8 @@ public class AuthController {
         }
         return null;
     }
+
+
+
+
 }

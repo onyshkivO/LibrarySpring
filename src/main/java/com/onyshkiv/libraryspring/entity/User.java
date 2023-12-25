@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.io.Serializable;
 import java.util.Set;
 
 
@@ -26,7 +27,7 @@ import java.util.Set;
         property = "login",
         generator = ObjectIdGenerators.PropertyGenerator.class
 )
-public class User{
+public class User implements Serializable {
 
     @Id
     @Column(name = "login")
