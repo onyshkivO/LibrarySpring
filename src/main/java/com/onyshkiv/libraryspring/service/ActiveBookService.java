@@ -10,6 +10,8 @@ import com.onyshkiv.libraryspring.exception.book.BookNotFoundException;
 import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
 import com.onyshkiv.libraryspring.repository.ActiveBookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,7 @@ public class ActiveBookService {
         return activeBookRepository.findAll();
     }
 
+    @Cacheable(key = "#id", value = "ActiveBook")
     public Optional<ActiveBook> getActiveBookById(int id) {
         return activeBookRepository.findById(id);
     }
@@ -70,6 +73,7 @@ public class ActiveBookService {
     }
 
     @Transactional
+    @CacheEvict(key = "#id", value = "ActiveBook")
     public ActiveBook updateActiveBook(Integer id, ActiveBook activeBook) {
         Optional<ActiveBook> optionalActiveBook = activeBookRepository.findById(id);
         if (optionalActiveBook.isEmpty())
@@ -105,6 +109,7 @@ public class ActiveBookService {
 
 
     @Transactional
+    @CacheEvict(key = "#id", value = "ActiveBook")
     public ActiveBook deleteActiveBookById(int id) {
         Optional<ActiveBook> optionalActiveBook = activeBookRepository.findById(id);
         if (optionalActiveBook.isEmpty())

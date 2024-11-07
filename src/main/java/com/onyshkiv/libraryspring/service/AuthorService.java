@@ -5,6 +5,8 @@ import com.onyshkiv.libraryspring.exception.author.AuthorNotFoundException;
 import com.onyshkiv.libraryspring.exception.author.AuthorNotSavedException;
 import com.onyshkiv.libraryspring.repository.AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +27,7 @@ public class AuthorService {
         return authorRepository.findAll();
     }
 
-
+    @Cacheable(key = "#id", value = "Author")
     public Optional<Author> getAuthorById(int id) {
         return authorRepository.findById(id);
 
@@ -39,6 +41,7 @@ public class AuthorService {
     }
 
     @Transactional
+    @CacheEvict(key = "#id", value = "Author")
     public Author updateAuthor(Integer id, Author author) {
         Optional<Author> optionalAuthor = authorRepository.findById(id);
         if (optionalAuthor.isEmpty())
@@ -48,6 +51,7 @@ public class AuthorService {
     }
 
     @Transactional
+    @CacheEvict(key = "#id", value = "Author")
     public Author deleteAuthorById(int id) {
         Optional<Author> optionalAuthor = authorRepository.findById(id);
         if (optionalAuthor.isEmpty())

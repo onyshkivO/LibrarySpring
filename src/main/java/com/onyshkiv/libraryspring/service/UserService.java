@@ -5,6 +5,8 @@ import com.onyshkiv.libraryspring.exception.user.UserNotFoundException;
 import com.onyshkiv.libraryspring.exception.user.UserNotSavedException;
 import com.onyshkiv.libraryspring.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +25,7 @@ public class UserService {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
-
+    @Cacheable(key = "#login", value = "User")
     public Optional<User> getUserByLogin(String login) {
         return userRepository.findById(login);
     }
@@ -44,6 +46,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(key = "#login", value = "User")
     public User updateUser(String login, User user) {
         Optional<User> optionalUser = userRepository.findById(login);
         if (optionalUser.isEmpty())
@@ -59,6 +62,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(key = "#login", value = "User")
     public User deleteUserByLogin(String login) {
         Optional<User> optionalUser = userRepository.findById(login);
         if (optionalUser.isEmpty())
@@ -68,6 +72,7 @@ public class UserService {
     }
 
     @Transactional
+    @CacheEvict(key = "#login", value = "User")
     public User changeUserStatus(String login){
         Optional<User> optionalUser = userRepository.findById(login);
         if (optionalUser.isEmpty()) throw new UserNotFoundException("There are not user with login "+ login);

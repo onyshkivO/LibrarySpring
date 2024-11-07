@@ -12,6 +12,8 @@ import com.onyshkiv.libraryspring.repository.AuthorRepository;
 import com.onyshkiv.libraryspring.repository.BookRepository;
 import com.onyshkiv.libraryspring.repository.PublicationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +49,7 @@ public class BookService {
         }
         return bookRepository.findAll();
     }
-
+    @Cacheable(key = "#isbn", value = "Book")
     public Optional<Book> getBookByIsbn(String isbn) {
         return bookRepository.findById(isbn);
     }
@@ -62,6 +64,7 @@ public class BookService {
     }
 
     @Transactional
+    @CacheEvict(key = "#isbn", value = "Book")
     public Book updateBook(String isbn, Book book) {
         Optional<Book> optionalBook = bookRepository.findById(isbn);
         if (optionalBook.isEmpty())
@@ -71,6 +74,7 @@ public class BookService {
     }
 
     @Transactional
+    @CacheEvict(key = "#isbn", value = "Book")
     public Book deleteBookByIsbn(String isbn) {
         Optional<Book> optionalBook = bookRepository.findById(isbn);
         if (optionalBook.isEmpty())
